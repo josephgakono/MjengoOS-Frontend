@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 
 const navLinks = [
   { label: 'Home', path: '/' },
@@ -75,9 +75,16 @@ function Navbar() {
           <ul className="navbar__links">
             {navLinks.map((link) => (
               <li key={link.path}>
-                <Link className="navbar__link" to={link.path} onClick={closeMenu}>
+                <NavLink
+                  className={({ isActive }) =>
+                    `navbar__link ${isActive ? 'navbar__link--active' : ''}`
+                  }
+                  to={link.path}
+                  onClick={closeMenu}
+                  end={link.path === '/'}
+                >
                   {link.label}
-                </Link>
+                </NavLink>
               </li>
             ))}
           </ul>
