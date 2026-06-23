@@ -1,5 +1,5 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import "./dashboard.css";
+import "../styles/dashboard.css"
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
