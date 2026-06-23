@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 
 const navLinks = [
+
   { label: 'Home', path: '/' },
   { label: 'Jobs', path: '/find-jobs' },
   { label: 'How it works', path: '/how-it-works' },
@@ -45,11 +46,24 @@ function Navbar() {
         ? 'Customer Profile'
         : 'Profile'
 
+  const navigate = useNavigate()
+
   const closeMenu = () => setMenuOpen(false)
+
+  const logout = () => {
+    localStorage.removeItem('access')
+    localStorage.removeItem('refresh')
+    localStorage.removeItem('user')
+
+    setAuth({ user: null, token: null })
+    setMenuOpen(false)
+    navigate('/login', { replace: true })
+  }
 
   return (
     <header className="navbar" role="banner">
       <nav className="navbar__inner" aria-label="Primary navigation">
+
         <Link className="navbar__brand" to="/" onClick={closeMenu} aria-label="MjengoOS home">
           <img className="navbar__logo" src="/mjengo-logo.png" alt="MjengoOS logo" />
           <span className="navbar__brand-copy">
@@ -96,8 +110,6 @@ function Navbar() {
                   Dashboard
                 </Link>
                 <div className="navbar__user">
-                  <span className="navbar__greeting">Hi, {username}</span>
-                  <span className="navbar__badge">{profileLabel}</span>
                   <span className="navbar__avatar" aria-label={`${username} profile avatar`}>
                     {avatarSrc ? (
                       <img src={avatarSrc} alt="" />
@@ -105,7 +117,20 @@ function Navbar() {
                       <span aria-hidden="true">{username.charAt(0).toUpperCase()}</span>
                     )}
                   </span>
+                  <span className="navbar__user-text">
+                    <span className="navbar__greeting">Hi, {username}</span>
+                    <span className="navbar__profile-label">{profileLabel}</span>
+                  </span>
+                  <button
+                    className="navbar__logout"
+                    type="button"
+                    onClick={logout}
+                    aria-label="Logout"
+                  >
+                    Logout
+                  </button>
                 </div>
+
               </>
             ) : (
               <>

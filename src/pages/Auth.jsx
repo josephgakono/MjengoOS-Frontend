@@ -1,0 +1,275 @@
+import { useMemo, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+
+const API_BASE_URL = 'https://mjengoos.onrender.com'
+
+const initialForm = {
+  username: '',
+  email: '',
+  phone: '',
+  password: '',
+  confirmPassword: '',
+  user_type: 'customer',
+}
+
+function getErrorMessage(errorData) {
+  if (!errorData) return 'Something went wrong. Please try again.'
+
+  if (typeof errorData === 'string') return errorData
+
+  if (errorData.detail) return errorData.detail
+
+  const firstKey = Object.keys(errorData)[0]
+  const firstValue = errorData[firstKey]
+
+  if (Array.isArray(firstValue)) {
+    return `${firstKey}: ${firstValue.join(' ')}`
+  }
+
+  if (typeof firstValue === 'string') {
+    return `${firstKey}: ${firstValue}`
+  }
+
+  return 'Please check your details and try again.'
+}
+
+function saveAuth({ tokens, user }) {
+  localStorage.setItem('access', tokens.access)
+  localStorage.setItem('refresh', tokens.refresh)
+  localStorage.setItem('user', JSON.stringify(user))
+  window.dispatchEvent(new Event('storage'))
+}
+
+function Auth() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const mode = location.pathname === '/signup' ? 'signup' : 'login'
+  const isSignup = mode === 'signup'
+  const [form, setForm] = useState(initialForm)
+  const [status, setStatus] = useState({ type: '', message: '' })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const pageCopy = useMemo(
+    () =>
+      isSignup
+        ? {
+            eyebrow: 'Create your MjengoOS account',
+            title: 'Start hiring or winning construction work.',
+            lead: 'Join as a customer to post jobs or as a worker to send quotations and manage projects.',
+            button: 'Create Account',
+            switchText: 'Already have an account?',
+            switchLink: 'Log in',
+            switchPath: '/login',
+          }
+        : {
+            eyebrow: 'Welcome back',
+            title: 'Log in to manage your construction work.',
+            lead: 'Access your jobs, quotations, projects, payments, updates, and messages.',
+            button: 'Log In',
+            switchText: 'New to MjengoOS?',
+            switchLink: 'Create an account',
+            switchPath: '/signup',
+          },
+    [isSignup],
+  )
+
+  const updateField = (event) => {
+    const { name, value } = event.target
+    setForm((current) => ({ ...current, [name]: value }))
+  }
+
+  const requestJson = async (endpoint, payload) => {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+
+    const data = await response.json().catch(() => null)
+
+    if (!response.ok) {
+      throw new Error(getErrorMessage(data))
+    }
+
+    return data
+  }
+
+  const login = async ({ username, password, user }) => {
+    const tokens = await requestJson('/api/token/', { username, password })
+    saveAuth({
+      tokens,
+      user: {
+        username,
+        user_type: user?.user_type || form.user_type,
+        email: user?.email || form.email,
+        phone: user?.phone || form.phone,
+        profile_image: user?.profile_picture || '',
+      },
+    })
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    setStatus({ type: '', message: '' })
+
+    if (isSignup && form.password !== form.confirmPassword) {
+      setStatus({ type: 'error', message: 'Passwords do not match.' })
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      if (isSignup) {
+        const user = await requestJson('/signup/', {
+          username: form.username.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          password: form.password,
+          user_type: form.user_type,
+        })
+
+        await login({
+          username: form.username.trim(),
+          password: form.password,
+          user,
+        })
+      } else {
+        await login({
+          username: form.username.trim(),
+          password: form.password,
+        })
+      }
+
+      navigate('/dashboard')
+    } catch (error) {
+      setStatus({
+        type: 'error',
+        message: error.message || 'Unable to complete this request.',
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <main className="auth-page">
+      <section className="auth-shell" aria-labelledby="auth-title">
+        <div className="auth-panel auth-panel--copy">
+          <span className="auth-panel__eyebrow">{pageCopy.eyebrow}</span>
+          <h1 id="auth-title">{pageCopy.title}</h1>
+          <p>{pageCopy.lead}</p>
+
+          <div className="auth-benefits" aria-label="Account benefits">
+            <span>Post jobs</span>
+            <span>Review quotations</span>
+            <span>Track payments</span>
+            <span>Manage updates</span>
+          </div>
+        </div>
+
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="auth-form__header">
+            <strong>{isSignup ? 'Sign up' : 'Login'}</strong>
+            <span>
+              {pageCopy.switchText}{' '}
+              <Link to={pageCopy.switchPath}>{pageCopy.switchLink}</Link>
+            </span>
+          </div>
+
+          <label className="auth-field">
+            <span>Username</span>
+            <input
+              name="username"
+              type="text"
+              value={form.username}
+              onChange={updateField}
+              autoComplete="username"
+              required
+            />
+          </label>
+
+          {isSignup && (
+            <>
+              <label className="auth-field">
+                <span>Email</span>
+                <input
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={updateField}
+                  autoComplete="email"
+                  required
+                />
+              </label>
+
+              <label className="auth-field">
+                <span>Phone Number</span>
+                <input
+                  name="phone"
+                  type="tel"
+                  value={form.phone}
+                  onChange={updateField}
+                  autoComplete="tel"
+                  placeholder="0712345678"
+                  required
+                />
+              </label>
+
+              <label className="auth-field">
+                <span>Account Type</span>
+                <select name="user_type" value={form.user_type} onChange={updateField} required>
+                  <option value="customer">Customer</option>
+                  <option value="worker">Worker</option>
+                  <option value="contractor">Contractor</option>
+                </select>
+              </label>
+            </>
+          )}
+
+          <label className="auth-field">
+            <span>Password</span>
+            <input
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={updateField}
+              autoComplete={isSignup ? 'new-password' : 'current-password'}
+              minLength={8}
+              required
+            />
+          </label>
+
+          {isSignup && (
+            <label className="auth-field">
+              <span>Confirm Password</span>
+              <input
+                name="confirmPassword"
+                type="password"
+                value={form.confirmPassword}
+                onChange={updateField}
+                autoComplete="new-password"
+                minLength={8}
+                required
+              />
+            </label>
+          )}
+
+          {status.message && (
+            <p className={`auth-form__status auth-form__status--${status.type}`} role="alert">
+              {status.message}
+            </p>
+          )}
+
+          <button className="auth-form__button" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Please wait...' : pageCopy.button}
+          </button>
+        </form>
+      </section>
+    </main>
+  )
+}
+
+export default Auth
