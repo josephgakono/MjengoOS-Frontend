@@ -2,8 +2,8 @@ import Sidebar from "../components/dashboard/Sidebar"
 import StatsCards from "../components/dashboard/StatsCards"
 import JobsTable from "../components/dashboard/JobsTable"
 import ActivityTimeline from "../components/dashboard/ActivityTimeline"
-// import EscrowOverview from "../components/dashboard/EscrowOverview"
-// import ProjectsChart from "../components/dashboard/ProjectsChart"
+import EscrowOverview from "../components/dashboard/EscrowOverview"
+import ProjectsChart from "../components/dashboard/ProjectsChart"
 
 import "../styles/dashboard.css"
 
@@ -58,24 +58,20 @@ export default function CustomerDashboard() {
                   <h3>Escrow Overview</h3>
                 </div>
 
-                {/* EscrowOverview import is commented out; avoid runtime crash */}
-                <p className="placeholder" style={{ marginTop: 16 }}>
-                  Escrow Overview is not available yet.
-                </p>
+                <EscrowOverview />
               </div>
+
 
               <div className="card">
                 <div className="card-header">
                   <h3>Projects At A Glance</h3>
                 </div>
 
-                {/* ProjectsChart import is commented out; avoid runtime crash */}
-                <p className="placeholder" style={{ marginTop: 16 }}>
-                  Projects Chart is not available yet.
-                </p>
+                <ProjectsChart />
               </div>
             </div>
           </div>
+
 
           {/* Right Side */}
           <div className="content-right">
