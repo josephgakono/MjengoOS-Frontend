@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { api } from "../../services/api";
+import { useEffect, useState } from "react"
+import { api } from "../../services/api"
 
 export default function StatsCards() {
   const [stats, setStats] = useState({
@@ -8,31 +8,26 @@ export default function StatsCards() {
     projects: 0,
     escrowHeld: 0,
     released: 0,
-  });
-
-  useEffect(() => {
-    fetchStats();
-  }, []);
+  })
 
   async function fetchStats() {
     try {
-      const [jobs, quotations, projects, payments] =
-        await Promise.all([
-          api.get("jobs/"),
-          api.get("quotations/"),
-          api.get("projects/"),
-          api.get("payments/"),
-        ]);
+      const [jobs, quotations, projects, payments] = await Promise.all([
+        api.get("jobs/"),
+        api.get("quotations/"),
+        api.get("projects/"),
+        api.get("payments/"),
+      ])
 
       const escrowHeld =
         payments
           ?.filter((p) => p.escrow_status === "held")
-          .reduce((sum, p) => sum + Number(p.amount), 0) || 0;
+          .reduce((sum, p) => sum + Number(p.amount), 0) || 0
 
       const released =
         payments
           ?.filter((p) => p.escrow_status === "released")
-          .reduce((sum, p) => sum + Number(p.amount), 0) || 0;
+          .reduce((sum, p) => sum + Number(p.amount), 0) || 0
 
       setStats({
         jobs: jobs?.length || 0,
@@ -40,25 +35,20 @@ export default function StatsCards() {
         projects: projects?.length || 0,
         escrowHeld,
         released,
-      });
+      })
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
   }
 
+  useEffect(() => {
+    fetchStats()
+  }, [])
+
   const cards = [
-    {
-      title: "Active Jobs",
-      value: stats.jobs,
-    },
-    {
-      title: "Quotations Received",
-      value: stats.quotations,
-    },
-    {
-      title: "Active Projects",
-      value: stats.projects,
-    },
+    { title: "Active Jobs", value: stats.jobs },
+    { title: "Quotations Received", value: stats.quotations },
+    { title: "Active Projects", value: stats.projects },
     {
       title: "Escrow Held",
       value: `KES ${stats.escrowHeld.toLocaleString()}`,
@@ -67,7 +57,7 @@ export default function StatsCards() {
       title: "Funds Released",
       value: `KES ${stats.released.toLocaleString()}`,
     },
-  ];
+  ]
 
   return (
     <section className="stats-grid">
@@ -78,5 +68,6 @@ export default function StatsCards() {
         </div>
       ))}
     </section>
-  );
+  )
 }
+

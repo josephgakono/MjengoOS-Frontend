@@ -1,49 +1,44 @@
-import { useEffect, useState } from "react";
-import { api } from "../../services/api";
+import { useEffect, useState } from "react"
+import { api } from "../../services/api"
 
 export default function JobsTable() {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchJobs();
-  }, []);
+  const [jobs, setJobs] = useState([])
+  const [loading, setLoading] = useState(true)
 
   async function fetchJobs() {
     try {
-      const data = await api.get("jobs/");
-      setJobs(data || []);
+      const data = await api.get("jobs/")
+      setJobs(data || [])
     } catch (error) {
-      console.error(error);
+      console.error(error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchJobs()
+  }, [])
 
   function statusClass(status) {
     switch (status) {
       case "open":
-        return "badge open";
-
+        return "badge open"
       case "quoted":
-        return "badge quoted";
-
+        return "badge quoted"
       case "assigned":
-        return "badge assigned";
-
+        return "badge assigned"
       case "in_progress":
-        return "badge progress";
-
+        return "badge progress"
       case "completed":
-        return "badge completed";
-
+        return "badge completed"
       default:
-        return "badge";
+        return "badge"
     }
   }
 
   if (loading) {
-    return <p className="loading">Loading jobs...</p>;
+    return <p className="loading">Loading jobs...</p>
   }
 
   return (
@@ -68,9 +63,7 @@ export default function JobsTable() {
                 <td>KES {Number(job.budget).toLocaleString()}</td>
 
                 <td>
-                  <span className={statusClass(job.status)}>
-                    {job.status}
-                  </span>
+                  <span className={statusClass(job.status)}>{job.status}</span>
                 </td>
 
                 <td>{job.created_at}</td>
@@ -78,13 +71,12 @@ export default function JobsTable() {
             ))
           ) : (
             <tr>
-              <td colSpan="5">
-                No jobs available
-              </td>
+              <td colSpan="5">No jobs available</td>
             </tr>
           )}
         </tbody>
       </table>
     </div>
-  );
+  )
 }
+

@@ -1,11 +1,11 @@
-import Sidebar from "../components/dashboard/Sidebar";
-import StatsCards from "../components/dashboard/StatsCards";
-import JobsTable from "../components/dashboard/JobsTable";
-import ActivityTimeline from "../components/dashboard/ActivityTimeline";
-import EscrowOverview from "../components/dashboard/EscrowOverview";
-import ProjectsChart from "../components/dashboard/ProjectsChart";
+import Sidebar from "../components/dashboard/Sidebar"
+import StatsCards from "../components/dashboard/StatsCards"
+import JobsTable from "../components/dashboard/JobsTable"
+import ActivityTimeline from "../components/dashboard/ActivityTimeline"
+// import EscrowOverview from "../components/dashboard/EscrowOverview"
+// import ProjectsChart from "../components/dashboard/ProjectsChart"
 
-import "../styles/dashboard.css";
+import "../styles/dashboard.css"
 
 export default function CustomerDashboard() {
   return (
@@ -17,9 +17,7 @@ export default function CustomerDashboard() {
         <header className="dashboard-header">
           <div>
             <h1>Customer Dashboard</h1>
-            <p>
-              Manage jobs, quotations, projects, escrow payments and reviews.
-            </p>
+            <p>Manage jobs, quotations, projects, escrow payments and reviews.</p>
           </div>
 
           <div className="header-user">
@@ -47,9 +45,7 @@ export default function CustomerDashboard() {
               <div className="card-header">
                 <h3>My Jobs</h3>
 
-                <button className="primary-btn">
-                  + Post New Job
-                </button>
+                <button className="primary-btn">+ Post New Job</button>
               </div>
 
               <JobsTable />
@@ -62,7 +58,10 @@ export default function CustomerDashboard() {
                   <h3>Escrow Overview</h3>
                 </div>
 
-                <EscrowOverview />
+                {/* EscrowOverview import is commented out; avoid runtime crash */}
+                <p className="placeholder" style={{ marginTop: 16 }}>
+                  Escrow Overview is not available yet.
+                </p>
               </div>
 
               <div className="card">
@@ -70,7 +69,10 @@ export default function CustomerDashboard() {
                   <h3>Projects At A Glance</h3>
                 </div>
 
-                <ProjectsChart />
+                {/* ProjectsChart import is commented out; avoid runtime crash */}
+                <p className="placeholder" style={{ marginTop: 16 }}>
+                  Projects Chart is not available yet.
+                </p>
               </div>
             </div>
           </div>
@@ -81,8 +83,6 @@ export default function CustomerDashboard() {
               <div className="card-header">
                 <h3>Recent Activity</h3>
               </div>
-
-              <ActivityTimeline />
             </div>
           </div>
         </section>
