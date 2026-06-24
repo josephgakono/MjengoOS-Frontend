@@ -1,7 +1,9 @@
 const BASE_URL = "https://mjengoos.onrender.com/";
 
 function getToken() {
-  return localStorage.getItem("token");
+  // Auth.jsx stores tokens as "access"/"refresh"
+  // Keep fallback for any legacy data that might still exist.
+  return localStorage.getItem("access") || localStorage.getItem("token");
 }
 
 // Generic request handler
@@ -16,7 +18,11 @@ async function request(endpoint, method = "GET", body = null) {
   });
 
   if (res.status === 401) {
-    localStorage.clear();
+    // Only clear auth-related keys to avoid nuking unrelated app state.
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     window.location.href = "/login";
     return;
   }
