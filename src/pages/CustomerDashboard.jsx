@@ -8,7 +8,7 @@ import PostJobModal from "../components/jobs/PostJobModal";
 import { useState } from "react";
 import "../styles/dashboard.css";
 import QuotationsPage from "../components/customer/quotations/QuotationsPage";
-// import { Menu } from "lucide-react";
+import DashboardHeader from "../components/dashboard/DashboardHeader";
 import { PanelLeft } from "lucide-react";
 
 export default function CustomerDashboard() {
@@ -28,32 +28,11 @@ export default function CustomerDashboard() {
         <main className="dashboard-main">
           {activeTab === "dashboard" && (
             <>
-              <header className="dashboard-header">
-                <button
-                  className="menu-btn"
-                  onClick={() => setSidebarOpen(true)}
-                >
-                 <PanelLeft size={28} strokeWidth={2.5} />
-                </button>
-                <div>
-                  <h1>Customer Dashboard</h1>
-                  <p>
-                    Manage jobs, quotations, projects, escrow payments and
-                    reviews.
-                  </p>
-                </div>
-
-                <div className="header-user">
-                  <img
-                    src="https://ui-avatars.com/api/?name=Customer"
-                    alt="Profile"
-                  />
-                  <div>
-                    <h4>Customer</h4>
-                    <span>MjengoOS User</span>
-                  </div>
-                </div>
-              </header>
+              <DashboardHeader
+                title="Customer Dashboard"
+                subtitle="Manage jobs, quotations, projects, escrow payments and reviews."
+                setSidebarOpen={setSidebarOpen}
+              />
 
               <StatsCards />
 
@@ -97,7 +76,17 @@ export default function CustomerDashboard() {
             </>
           )}
 
-          {activeTab === "quotations" && <QuotationsPage />}
+          {activeTab === "quotations" && (
+            <>
+              <DashboardHeader
+                title="Quotations"
+                subtitle="Review and manage quotations from contractors."
+                setSidebarOpen={setSidebarOpen}
+              />
+
+              <QuotationsPage />
+            </>
+          )}
         </main>
       </div>
       <PostJobModal
