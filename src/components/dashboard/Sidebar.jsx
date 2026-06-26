@@ -27,7 +27,7 @@ export default function Sidebar() {
     {
       name: "Quotations",
       path: "/customer/quotations",
-      icon: <FileText size={20} />,
+      icon: <FileText size={18} />,
     },
     {
       name: "Projects",
@@ -67,16 +67,13 @@ export default function Sidebar() {
         <h2>MjengoOS</h2>
         <span>Building the future, together</span>
       </div>
-
       <nav>
         {menuItems.map((item) => (
           <NavLink
             key={item.name}
             to={item.path}
             className={({ isActive }) =>
-              isActive
-                ? "sidebar-link active"
-                : "sidebar-link"
+              isActive ? "sidebar-link active" : "sidebar-link"
             }
           >
             {item.icon}
@@ -84,12 +81,9 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
-
       <div className="support-card">
         <h4>Need Help?</h4>
-        <p>
-          Our support team is here to help.
-        </p>
+        <p>Our support team is here to help.</p>
 
         <button>Contact Support</button>
       </div>

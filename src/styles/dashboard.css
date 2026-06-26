@@ -127,7 +127,6 @@
 .dashboard-main {
   flex: 1;
   padding: 24px;
-  background: #f8fafc;
 }
 
 
@@ -141,10 +140,26 @@
 
 .dashboard-header h1 {
   font-size: 32px;
+  color: #634ce7;
+  position: relative;
+  padding-bottom: 12px; /* Spaces out the text and line */
+}
+
+/* Creates the custom split-color underline */
+.dashboard-header h1::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 120px; /* Adjust width of the line */
+  height: 4px;  /* Thickness of the line */
+  border-radius: 2px;
+  /* Left 50% orange (#ff9800), right 50% blue (#00a2ff) */
+  background: linear-gradient(to right, #ff9800 50%, #00a2ff 50%);
 }
 
 .dashboard-header p {
-  color: #666;
+  color:  #00b2ff;
 }
 
 .header-user {
@@ -451,4 +466,506 @@
   justify-content: space-between;
   border-bottom: 1px solid #eee;
   padding-bottom: 5px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0,0,0,.5);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 999;
+}
+
+.job-modal {
+  width: 100%;
+  max-width: 600px;
+
+  background: white;
+
+  border-radius: 20px;
+
+  padding: 24px;
+
+  animation: modalIn .2s ease;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 24px;
+}
+
+.close-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  font-size: 22px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 12px;
+
+  padding: 12px;
+}
+
+.submit-job-btn {
+  width: 100%;
+
+  background: #4f46e5;
+
+  color: white;
+
+  border: none;
+
+  border-radius: 12px;
+
+  padding: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+/* ==========================================
+   QUOTATIONS PAGE
+========================================== */
+
+.quotations-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.quotation-loading {
+  background: var(--mjengo-white);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: var(--mjengo-shadow);
+  color: var(--mjengo-text-soft);
+  font-weight: 500;
+}
+
+/* ==========================================
+   SECTION CARDS
+========================================== */
+
+.quotation-section {
+  background: var(--mjengo-white);
+  border-radius: 24px;
+  padding: 24px;
+  border: 1px solid var(--mjengo-border);
+  box-shadow: var(--mjengo-shadow);
+}
+
+.quotation-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.quotation-section-header h2 {
+  color: var(--mjengo-dark);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.quotation-section-header p {
+  color: var(--mjengo-text-soft);
+  font-size: 0.9rem;
+}
+
+/* ==========================================
+   TABLE
+========================================== */
+
+.quotation-table-wrapper {
+  overflow-x: auto;
+}
+
+.quotation-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.quotation-table thead {
+  background: #f8fafc;
+}
+
+.quotation-table th {
+  text-align: left;
+  padding: 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--mjengo-dark);
+  border-bottom: 1px solid var(--mjengo-border);
+}
+
+.quotation-table td {
+  padding: 18px 16px;
+  border-bottom: 1px solid var(--mjengo-border);
+  color: var(--mjengo-dark);
+  font-size: 0.95rem;
+}
+
+.quotation-table tr:last-child td {
+  border-bottom: none;
+}
+
+.quotation-table tbody tr:hover {
+  background: rgba(0, 178, 255, 0.03);
+}
+
+/* ==========================================
+   JOB TITLE CELL
+========================================== */
+
+.job-title {
+  font-weight: 600;
+  color: var(--mjengo-dark);
+}
+
+.job-budget {
+  font-size: 0.85rem;
+  color: var(--mjengo-text-soft);
+  margin-top: 4px;
+}
+
+/* ==========================================
+   STATUS BADGES
+========================================== */
+
+.quote-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.quote-status.accepted {
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+}
+
+.quote-status.rejected {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+.quote-status.pending {
+  background: rgba(99, 76, 231, 0.12);
+  color: var(--mjengo-purple);
+}
+
+/* ==========================================
+   REJECTED QUOTES
+========================================== */
+
+.view-rejected-btn {
+  border: none;
+  background: transparent;
+  color: var(--mjengo-blue);
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.view-rejected-btn:hover {
+  opacity: 0.8;
+}
+
+.rejected-container {
+  background: #fafafa;
+  border: 1px solid var(--mjengo-border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 12px;
+}
+
+.rejected-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+}
+
+.rejected-item:not(:last-child) {
+  border-bottom: 1px solid var(--mjengo-border);
+}
+
+/* ==========================================
+   REVIEW QUOTATIONS
+========================================== */
+
+.review-card {
+  background: var(--mjengo-white);
+  border-radius: 24px;
+  padding: 24px;
+  border: 1px solid var(--mjengo-border);
+  box-shadow: var(--mjengo-shadow);
+}
+
+.review-header {
+  margin-bottom: 20px;
+}
+
+.review-header h2 {
+  color: var(--mjengo-dark);
+  margin-bottom: 6px;
+}
+
+.review-header p {
+  color: var(--mjengo-text-soft);
+}
+
+.job-selector {
+  width: 100%;
+  max-width: 450px;
+  padding: 14px 16px;
+  border: 1px solid var(--mjengo-border);
+  border-radius: 14px;
+  background: white;
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+
+.job-selector:focus {
+  outline: none;
+  border-color: var(--mjengo-blue);
+}
+
+/* ==========================================
+   QUOTATION CARDS
+========================================== */
+
+.quotation-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.quotation-card {
+  border: 1px solid var(--mjengo-border);
+  border-radius: 18px;
+  padding: 20px;
+  transition: 0.25s;
+  background: white;
+}
+
+.quotation-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(18, 18, 26, 0.08);
+}
+
+.quotation-card h4 {
+  color: var(--mjengo-dark);
+  margin-bottom: 12px;
+}
+
+.quotation-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: var(--mjengo-text-soft);
+  font-size: 0.9rem;
+}
+
+.quote-amount {
+  color: var(--mjengo-blue);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.quote-days {
+  color: var(--mjengo-text-soft);
+  margin-bottom: 18px;
+}
+
+.view-quote-btn {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  background: var(--mjengo-blue);
+  color: white;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.view-quote-btn:hover {
+  opacity: 0.9;
+}
+
+/* ==========================================
+   MODAL
+========================================== */
+
+.quote-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 8, 13, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5000;
+  padding: 20px;
+}
+
+.quote-modal {
+  width: 100%;
+  max-width: 700px;
+  background: white;
+  border-radius: 28px;
+  padding: 30px;
+  box-shadow: 0 40px 80px rgba(0,0,0,.25);
+}
+
+.quote-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.quote-modal-header h2 {
+  color: var(--mjengo-dark);
+}
+
+.close-modal-btn {
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.quote-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.quote-detail {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 14px;
+}
+
+.quote-detail span {
+  display: block;
+  color: var(--mjengo-text-soft);
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+}
+
+.quote-detail strong {
+  color: var(--mjengo-dark);
+}
+
+.quote-message {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.quote-message h4 {
+  margin-bottom: 12px;
+  color: var(--mjengo-dark);
+}
+
+.quote-message p {
+  line-height: 1.7;
+  color: var(--mjengo-text-soft);
+}
+
+.quote-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.accept-btn {
+  flex: 1;
+  border: none;
+  border-radius: 14px;
+  padding: 14px;
+  background: var(--mjengo-blue);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reject-btn {
+  flex: 1;
+  border: none;
+  border-radius: 14px;
+  padding: 14px;
+  background: #ef4444;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 768px) {
+
+  .quotation-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .quote-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quote-actions {
+    flex-direction: column;
+  }
+
+  .quotation-section,
+  .review-card {
+    padding: 18px;
+  }
 }

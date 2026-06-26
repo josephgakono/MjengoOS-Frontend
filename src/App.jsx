@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import Auth from './pages/Auth'
 import Home from './pages/Home'
 import CustomerDashboard from './pages/CustomerDashboard'
+import QuotationsPage from "./components/customer/quotations/QuotationsPage";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/login" element={<Auth />} />
         <Route path="/signup" element={<Auth />} />
         <Route path="/dashboard" element={<CustomerDashboard />} />
+        <Route path="/customer/quotations" element={<QuotationsPage />}/>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
