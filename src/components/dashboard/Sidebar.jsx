@@ -10,83 +10,96 @@ import {
   User,
 } from "lucide-react";
 
-import { NavLink } from "react-router-dom";
-
-export default function Sidebar() {
+export default function Sidebar({
+  activeTab,
+  setActiveTab,
+  sidebarOpen,
+  setSidebarOpen,
+}) {
   const menuItems = [
     {
       name: "Dashboard",
-      path: "/customer/dashboard",
+      tab: "dashboard",
       icon: <LayoutDashboard size={20} />,
     },
     {
       name: "My Jobs",
-      path: "/customer/jobs",
+      tab: "jobs",
       icon: <Briefcase size={20} />,
     },
     {
       name: "Quotations",
-      path: "/customer/quotations",
-      icon: <FileText size={18} />,
+      tab: "quotations",
+      icon: <FileText size={20} />,
     },
     {
       name: "Projects",
-      path: "/customer/projects",
+      tab: "projects",
       icon: <FolderKanban size={20} />,
     },
     {
       name: "Escrow Center",
-      path: "/customer/escrow",
+      tab: "escrow",
       icon: <ShieldCheck size={20} />,
     },
     {
       name: "Payments",
-      path: "/customer/payments",
+      tab: "payments",
       icon: <CreditCard size={20} />,
     },
     {
       name: "Messages",
-      path: "/customer/messages",
+      tab: "messages",
       icon: <MessageSquare size={20} />,
     },
     {
       name: "Reviews",
-      path: "/customer/reviews",
+      tab: "reviews",
       icon: <Star size={20} />,
     },
     {
       name: "Profile",
-      path: "/customer/profile",
+      tab: "profile",
       icon: <User size={20} />,
     },
   ];
 
   return (
-    <aside className="sidebar">
-      <div className="logo-section">
-        <h2>MjengoOS</h2>
-        <span>Building the future, together</span>
-      </div>
-      <nav>
-        {menuItems.map((item) => (
-          <NavLink
-            key={item.name}
-            to={item.path}
-            className={({ isActive }) =>
-              isActive ? "sidebar-link active" : "sidebar-link"
-            }
-          >
-            {item.icon}
-            <span>{item.name}</span>
-          </NavLink>
-        ))}
-      </nav>
-      <div className="support-card">
-        <h4>Need Help?</h4>
-        <p>Our support team is here to help.</p>
+    <>
+      <div
+        className={sidebarOpen ? "sidebar-overlay active" : "sidebar-overlay"}
+        onClick={() => setSidebarOpen(false)}
+      ></div>
 
-        <button>Contact Support</button>
-      </div>
-    </aside>
+      <aside className={sidebarOpen ? "sidebar open" : "sidebar"}>
+        <div className="logo-section">
+          <h2>MjengoOS</h2>
+          <span>Building the future, together</span>
+        </div>
+        <nav>
+          {menuItems.map((item) => (
+            <button
+              key={item.tab}
+              className={
+                activeTab === item.tab ? "sidebar-link active" : "sidebar-link"
+              }
+              onClick={() => {
+                setActiveTab(item.tab);
+                setSidebarOpen(false);
+              }}
+            >
+              {item.icon}
+              <span>{item.name}</span>
+            </button>
+          ))}
+        </nav>
+        <div className="support-card">
+          <h4>Need Help?</h4>
+          <p>Our support team is here to help.</p>
+
+          <button>Contact Support</button>
+        </div>
+      </aside>
+    </>
   );
 }
