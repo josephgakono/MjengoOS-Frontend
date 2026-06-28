@@ -1,15 +1,15 @@
 import { api } from "../services/api";
 
-export async function buildQuotationData(
-  quotations,
-  jobs
-) {
+export async function buildQuotationData(quotations = [], jobs = []) {
   try {
-    // Get every worker profile
-    const workers = await api.get("workerprofile/");
+    //--------------------------------------------------
+    // Fetch workers and users
+    //--------------------------------------------------
 
-    // Get every user
-    const users = await api.get("users/");
+    const [workers, users] = await Promise.all([
+      api.get("workerprofile/"),
+      api.get("users/"),
+    ]);
 
     //--------------------------------------------------
     // Create lookup maps
@@ -23,30 +23,48 @@ export async function buildQuotationData(
 
     const usersMap = {};
 
-    users.forEach((user) => {
+    (users || []).forEach((user) => {
       usersMap[user.id] = user;
     });
 
     const workersMap = {};
 
-    workers.forEach((worker) => {
+    (workers || []).forEach((worker) => {
       workersMap[worker.id] = {
         ...worker,
-        user: usersMap[worker.user],
+        user: usersMap[worker.user] || null,
       };
     });
 
     //--------------------------------------------------
-    // Merge everything
+    // Merge quotation + job + worker
     //--------------------------------------------------
+
+    return (quotations || []).map((quotation) => ({
+      ...quotation,
+
+      job: jobsMap[quotation.job] || null,
+
+      worker: workersMap[quotation.worker] || {
+        id: quotation.worker,
+        profession: "Unknown Worker",
+        experience_years: 0,
+        location: "Unknown",
+        verified: false,
+        hourly_rate: 0,
+        average_rating: 0,
+        user: {
+          username: "Unknown Worker",
+          profile_picture: null,
+        },
+      },
+    }));
+  } catch (error) {
+    console.error("Failed to build quotation data:", error);
 
     return quotations.map((quotation) => ({
       ...quotation,
-      job: jobsMap[quotation.job],
-      worker: workersMap[quotation.worker],
+      job: jobs.find((j) => j.id === quotation.job) || null,
     }));
-  } catch (error) {
-    console.error(error);
-    return quotations;
   }
 }
