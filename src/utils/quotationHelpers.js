@@ -6,7 +6,7 @@ export async function buildQuotationData(
 ) {
   try {
     // Get every worker profile
-    const workers = await api.get("worker-profiles/");
+    const workers = await api.get("workerprofile/");
 
     // Get every user
     const users = await api.get("users/");

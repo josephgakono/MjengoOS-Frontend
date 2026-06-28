@@ -8,7 +8,7 @@ export default function ActivityTimeline() {
     try {
       const [notifications, progress, jobs, quotations] = await Promise.all([
         api.get("notifications/"),
-        api.get("progressupdates/"),
+        api.get("progress-updates/"),
         api.get("jobs/"),
         api.get("quotations/"),
       ])

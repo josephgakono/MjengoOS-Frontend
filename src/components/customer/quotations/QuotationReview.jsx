@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Eye, MapPin, CalendarDays, Wallet, Clock3, User } from "lucide-react";
+import "../../../styles/quotationReview.css";
 
 import QuotationModal from "./QuotationModal";
 
