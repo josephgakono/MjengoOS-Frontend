@@ -819,19 +819,19 @@ a{
     border-bottom:1px solid #eef2f7;
 }
 
-/* ======================================================
-   MODAL
-====================================================== */
+/* ==========================================================
+   POST JOB MODAL
+========================================================== */
 
 .modal-overlay{
     position:fixed;
     inset:0;
+    background:rgba(18,18,26,.65);
+    backdrop-filter:blur(6px);
 
     display:flex;
     justify-content:center;
     align-items:center;
-
-    background:rgba(0,0,0,.45);
 
     padding:20px;
 
@@ -840,90 +840,232 @@ a{
 
 .job-modal{
     width:100%;
-    max-width:650px;
+    max-width:620px;
+    max-height:85vh;
+
+    overflow-y:auto;
 
     background:#fff;
 
-    border-radius:24px;
+    border-radius:22px;
 
     padding:28px;
+
+    box-shadow:0 30px 80px rgba(0,0,0,.28);
 
     animation:modalIn .25s ease;
 }
 
-@keyframes modalIn{
 
-    from{
-        opacity:0;
-        transform:translateY(20px);
-    }
 
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
+/* Scrollbar */
 
+.job-modal::-webkit-scrollbar{
+    width:8px;
 }
+
+.job-modal::-webkit-scrollbar-thumb{
+    background:#cbd5e1;
+    border-radius:20px;
+}
+
+.job-modal::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
 
 .modal-header{
     display:flex;
     justify-content:space-between;
-    align-items:center;
+    align-items:flex-start;
 
     margin-bottom:24px;
 }
 
-.close-btn{
-    border:none;
-    background:none;
-
-    font-size:1.5rem;
-
-    cursor:pointer;
+.modal-header h2{
+    color:#12121a;
+    font-size:1.7rem;
+    font-weight:700;
+    margin:0;
 }
 
-.form-group{
-    margin-bottom:20px;
-}
-
-.form-group label{
-    display:block;
-    margin-bottom:8px;
-    font-weight:600;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select{
-
-    width:100%;
-
-    padding:14px;
-
-    border-radius:14px;
-
-    border:1px solid #d1d5db;
-
+.modal-header p{
+    margin-top:6px;
+    color:#64748b;
     font-size:.95rem;
 }
 
-.form-group textarea{
-    resize:vertical;
-    min-height:120px;
-}
+/* ==========================================================
+   CLOSE BUTTON
+========================================================== */
 
-.submit-job-btn{
-    width:100%;
+.close-btn{
+
+    width:44px;
+    height:44px;
 
     border:none;
 
-    padding:15px;
+    border-radius:50%;
+
+    background:#f1f5f9;
+
+    color:#12121a;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    cursor:pointer;
+
+    transition:.25s ease;
+}
+
+.close-btn:hover{
+
+    background:#ef4444;
+
+    color:#fff;
+
+    transform:rotate(90deg);
+}
+
+/* ==========================================================
+   FORM
+========================================================== */
+
+.form-group{
+
+    margin-bottom:18px;
+}
+
+.form-group label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+    color:#12121a;
+
+    font-size:15px;
+}
+
+/* Inputs */
+
+.form-group input,
+.form-group textarea{
+
+    width:100%;
+
+    padding:14px 16px;
+
+    border:1px solid #dbe2ea;
 
     border-radius:14px;
 
-    background:#634ce7;
+    background:#fff;
+
+    color:#12121a !important;
+
+    font-size:15px;
+
+    transition:.25s;
+}
+
+.form-group textarea{
+
+    min-height:130px;
+
+    resize:vertical;
+}
+
+/* Placeholder */
+
+.form-group input::placeholder,
+.form-group textarea::placeholder{
+
+    color:#12121a;
+
+    opacity:.45;
+}
+
+/* Focus */
+
+.form-group input:focus,
+.form-group textarea:focus{
+
+    outline:none;
+
+    border-color:#00b2ff;
+
+    box-shadow:0 0 0 4px rgba(0,178,255,.15);
+}
+
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
+.modal-actions{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:14px;
+
+    margin-top:28px;
+}
+
+/* Cancel */
+
+.cancel-btn{
+
+    padding:14px 24px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#1685e0;
+
+    color:#12121a;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+}
+
+.cancel-btn:hover{
+
+    background:#35023d;
+}
+
+/* Submit */
+
+.submit-job-btn{
+
+    padding:14px 30px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:linear-gradient(135deg,#00b2ff,#634ce7);
 
     color:#fff;
+
+    font-size:15px;
 
     font-weight:600;
 
@@ -933,7 +1075,47 @@ a{
 }
 
 .submit-job-btn:hover{
-    background:#4f39d9;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 18px 35px rgba(99,76,231,.25);
+}
+
+.submit-job-btn:disabled{
+
+    opacity:.6;
+
+    cursor:not-allowed;
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media(max-width:640px){
+
+    .job-modal{
+
+        padding:22px;
+
+        max-height:90vh;
+    }
+
+    .modal-header h2{
+
+        font-size:1.4rem;
+    }
+
+    .modal-actions{
+
+        flex-direction:column-reverse;
+    }
+
+    .cancel-btn,
+    .submit-job-btn{
+
+        width:100%;
+    }
 }
 
 /* ======================================================
