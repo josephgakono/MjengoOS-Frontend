@@ -1,19 +1,14 @@
 import { useState } from "react";
+import { X } from "lucide-react";
 import { api } from "../../services/api";
 
-export default function PostJobModal({
-  isOpen,
-  onClose,
-  onJobCreated,
-}) {
+export default function PostJobModal({ isOpen, onClose, onJobCreated }) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     location: "",
     budget: "",
   });
- 
-
 
   const [loading, setLoading] = useState(false);
 
@@ -23,10 +18,7 @@ export default function PostJobModal({
     try {
       setLoading(true);
 
-      const response = await api.post(
-        "jobs/",
-        formData
-      );
+      const response = await api.post("jobs/", formData);
 
       onJobCreated(response);
 
@@ -51,20 +43,18 @@ export default function PostJobModal({
   return (
     <div className="modal-overlay">
       <div className="job-modal">
-
         <div className="modal-header">
-          <h2>Post New Job</h2>
+          <div>
+            <h2>Post New Job</h2>
+            <p>Create a job and receive quotations from skilled workers.</p>
+          </div>
 
-          <button
-            className="close-btn"
-            onClick={onClose}
-          >
-            ✕
+          <button type="button" className="close-btn" onClick={onClose}>
+            <X size={22} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-
           <div className="form-group">
             <label>Job Title</label>
 
@@ -77,6 +67,7 @@ export default function PostJobModal({
                   title: e.target.value,
                 })
               }
+              placeholder="e.g. Build a 3-bedroom house"
               required
             />
           </div>
@@ -87,6 +78,7 @@ export default function PostJobModal({
             <textarea
               rows="4"
               value={formData.description}
+              placeholder="Describe your project, materials, expectations and any important details..."
               onChange={(e) =>
                 setFormData({
                   ...formData,
@@ -103,6 +95,7 @@ export default function PostJobModal({
             <input
               type="text"
               value={formData.location}
+              placeholder="e.g. Nairobi, Westlands"
               onChange={(e) =>
                 setFormData({
                   ...formData,
@@ -112,13 +105,13 @@ export default function PostJobModal({
               required
             />
           </div>
-
           <div className="form-group">
             <label>Budget (KES)</label>
 
             <input
               type="number"
               value={formData.budget}
+              placeholder="e.g. 250000"
               onChange={(e) =>
                 setFormData({
                   ...formData,
@@ -129,16 +122,15 @@ export default function PostJobModal({
             />
           </div>
 
-          <button
-            type="submit"
-            className="submit-job-btn"
-            disabled={loading}
-          >
-            {loading
-              ? "Posting..."
-              : "Create Job"}
-          </button>
+          <div className="modal-actions">
+            <button type="button" className="cancel-btn" onClick={onClose}>
+              Cancel
+            </button>
 
+            <button type="submit" className="submit-job-btn" disabled={loading}>
+              {loading ? "Posting..." : "Create Job"}
+            </button>
+          </div>
         </form>
       </div>
     </div>
