@@ -7,14 +7,19 @@ import {
   User,
   Briefcase,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { api } from "../services/api";
 
 export default function Jobs() {
+  const user = JSON.parse(localStorage.getItem("user"));
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
+  const button = getButtonState();
+  const [showPopup, setShowPopup] = useState(false);
   const [search, setSearch] = useState("");
+  
 
   useEffect(() => {
     fetchJobs();
@@ -34,6 +39,30 @@ export default function Jobs() {
     }
   }
 
+  function getButtonState() {
+  if (!user) {
+    return {
+      text: "Login to Quote",
+      action: () => navigate("/login"),
+    };
+  }
+
+  if (user.user_type === "worker" || user.user_type === "contractor") {
+    return {
+      text: "Quote for this Job",
+      action: () => {
+        // We'll implement quotation later.
+        console.log("Open quotation modal");
+      },
+    };
+  }
+
+  return {
+    text: "Only Workers Can Quote",
+    action: () => setShowPopup(true),
+  };
+}
+
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
       const text = (
@@ -49,21 +78,14 @@ export default function Jobs() {
 
   return (
     <div className="jobs-page">
-
       {/* HERO */}
 
       <section className="jobs-hero">
+        <h1>Find your next construction job.</h1>
 
-        <h1>
-          Find your next construction job.
-        </h1>
-
-        <p>
-          Browse projects posted by customers across Kenya.
-        </p>
+        <p>Browse projects posted by customers across Kenya.</p>
 
         <div className="jobs-search">
-
           <Search size={20} />
 
           <input
@@ -72,159 +94,101 @@ export default function Jobs() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-
         </div>
-
       </section>
 
       {/* RESULTS */}
 
       <section className="jobs-results">
-
         <div className="jobs-results-header">
-
-          <h2>
-
-            {filteredJobs.length} Open Jobs
-
-          </h2>
-
+          <h2>{filteredJobs.length} Open Jobs</h2>
         </div>
 
         {loading ? (
-
-          <div className="jobs-loading">
-
-            Loading jobs...
-
-          </div>
-
+          <div className="jobs-loading">Loading jobs...</div>
         ) : filteredJobs.length === 0 ? (
-
           <div className="jobs-empty">
-
             <Briefcase size={70} />
 
             <h3>No jobs found</h3>
 
-            <p>
-
-              Try changing your search.
-
-            </p>
-
+            <p>Try changing your search.</p>
           </div>
-
         ) : (
-
           <div className="jobs-grid">
-
             {filteredJobs.map((job) => (
-
-              <article
-                key={job.id}
-                className="job-card-home"
-              >
-
+              <article key={job.id} className="job-card-home">
                 {job.image && (
-                  <img
-                    src={job.image}
-                    alt={job.title}
-                    className="job-image"
-                  />
+                  <img src={job.image} alt={job.title} className="job-image" />
                 )}
 
                 <div className="job-body">
-
                   <div className="job-top">
-
-                    <span className="job-open">
-
-                      OPEN
-
-                    </span>
+                    <span className="job-open">OPEN</span>
 
                     <span className="job-budget">
-
                       KES {Number(job.budget).toLocaleString()}
-
                     </span>
-
                   </div>
 
-                  <h3>
-
-                    {job.title}
-
-                  </h3>
+                  <h3>{job.title}</h3>
 
                   <p className="job-description">
-
                     {job.description.length > 170
-                      ? job.description.slice(0,170)+"..."
+                      ? job.description.slice(0, 170) + "..."
                       : job.description}
-
                   </p>
 
                   <div className="job-meta">
-
                     <span>
-
                       <MapPin size={16} />
 
                       {job.location}
-
                     </span>
 
                     <span>
-
                       <Wallet size={16} />
-
                       Budget
-
                     </span>
-
                   </div>
 
                   <div className="job-footer">
-
                     <div>
-
                       <User size={16} />
 
                       {job.customer_username}
-
                     </div>
 
                     <div>
-
                       <Calendar size={16} />
 
-                      {new Date(
-                        job.created_at
-                      ).toLocaleDateString()}
-
+                      {new Date(job.created_at).toLocaleDateString()}
                     </div>
-
                   </div>
 
-                  <button
-                    className="apply-btn"
-                  >
-                    Login to Quote
+                  <button className="apply-btn" onClick={button.action}>
+                    {button.text}
                   </button>
-
                 </div>
-
               </article>
-
             ))}
           </div>
-
         )}
-
       </section>
+      {showPopup && (
+        <div
+          className="quote-popup-overlay"
+          onClick={() => setShowPopup(false)}
+        >
+          <div className="quote-popup" onClick={(e) => e.stopPropagation()}>
+            <h3>Worker Profile Required</h3>
 
+            <p>Login with a worker profile to quote for this job.</p>
+
+            <button onClick={() => setShowPopup(false)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
