@@ -27,29 +27,16 @@ export default function QuotationsPage() {
       const quotationsData = await api.get("quotations/");
 
       const jobsArray = Array.isArray(jobsData) ? jobsData : [];
-      const quotationsArray = Array.isArray(quotationsData) ? quotationsData : [];
+      const quotationsArray = Array.isArray(quotationsData)
+        ? quotationsData
+        : [];
 
       // Backend already scopes /jobs/ and /quotations/ by request.user.
-      // We still keep a safe client-side filter, but now it's username-based.
-      const myJobs = customerUsername
-        ? jobsArray.filter((j) => {
-            // Different serializers may expose customer as:
-            // - j.customer_username (preferred)
-            // - j.customer (username string)
-            // - j.customer.username (nested)
-            return (
-              j.customer_username === customerUsername ||
-              j.customer === customerUsername ||
-              j.customer?.username === customerUsername
-            );
-          })
-        : jobsArray;
+      // Do not re-filter by username here because /jobs/ uses JobSerializer(fields='__all__')
+      // where `customer` is typically a numeric user id.
+      const myJobs = jobsArray;
 
-      // Quotations: keep those related to our jobs.
-      // Quotation serializer may expose quotation.job as:
-      // - a job id (number)
-      // - a job object
-      // - a job uuid/string
+      // Group quotations by job id.
       const myJobIds = new Set(myJobs.map((j) => j.id));
       const myQuotations = quotationsArray.filter((q) => {
         if (myJobIds.has(q.job)) return true;
@@ -61,7 +48,6 @@ export default function QuotationsPage() {
       setQuotations(myQuotations);
 
       const merged = await buildQuotationData(myQuotations, myJobs);
-
 
       setFullQuotations(merged);
     } catch (error) {
@@ -82,14 +68,15 @@ export default function QuotationsPage() {
   return (
     <div className="quotations-page">
       {/* REVIEW QUOTATIONS */}
+
+      {/* SUMMARY TABLE */}
+      <QuotationSummary jobs={jobs} quotations={quotations} />
+
       <QuotationReview
         jobs={jobs}
         quotations={fullQuotations}
         refreshData={fetchData}
       />
-
-      {/* SUMMARY TABLE */}
-      <QuotationSummary jobs={jobs} quotations={quotations} />
     </div>
   );
 }

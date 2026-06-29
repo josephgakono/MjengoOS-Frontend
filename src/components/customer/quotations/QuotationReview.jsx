@@ -9,12 +9,28 @@ export default function QuotationReview({ jobs, quotations, refreshData }) {
   const [openModal, setOpenModal] = useState(false);
 
   const jobsWithQuotations = useMemo(() => {
-    return jobs.map((job) => ({
-      ...job,
-      quotations: quotations.filter(
-        (quotation) => quotation.job?.id === job.id,
-      ),
-    }));
+    return jobs.map((job) => {
+      const jobId = job?.id;
+      const jobObj = job ?? null;
+
+      return {
+        ...jobObj,
+        quotations: (quotations || []).filter((quotation) => {
+          // quotation.job might be an id, an expanded job object, or null
+          const qJob = quotation?.job;
+          if (qJob == null) return false;
+
+          if (typeof qJob === "object") {
+            // QuotationSerializer typically returns job as an id (not expanded),
+            // but handle the case where it is expanded.
+            return qJob?.id === jobId;
+          }
+
+          // qJob is likely an id
+          return qJob === jobId;
+        }),
+      };
+    });
   }, [jobs, quotations]);
 
   return (
@@ -82,9 +98,17 @@ export default function QuotationReview({ jobs, quotations, refreshData }) {
                       />
 
                       <div>
-                        <h4>{quotation.worker?.user?.username}</h4>
+                        <h4>
+                          {quotation.worker?.user?.username ||
+                            quotation.worker?.username ||
+                            "Worker"}
+                        </h4>
 
-                        <span>{quotation.worker?.profession}</span>
+                        <span>
+                          {quotation.worker?.profession ||
+                            quotation.worker?.user?.profession ||
+                            ""}
+                        </span>
                       </div>
                     </div>
 

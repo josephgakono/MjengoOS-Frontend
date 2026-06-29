@@ -1,0 +1,262 @@
+/* =========================================================
+   QUOTATION SUMMARY
+========================================================= */
+
+.quotation-summary {
+    margin-top: 40px;
+}
+
+.summary-header {
+    margin-bottom: 28px;
+}
+
+.summary-header h2 {
+    font-size: 2rem;
+    color: #12121a;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.summary-header p {
+    color: #64748b;
+    font-size: 1rem;
+}
+
+/* =========================================================
+   SUMMARY CARDS
+========================================================= */
+
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+    margin-bottom: 35px;
+}
+
+.summary-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, .06);
+    border: 1px solid #edf2f7;
+    transition: .25s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .08);
+}
+
+.summary-card svg {
+    width: 55px;
+    height: 55px;
+    padding: 14px;
+    border-radius: 16px;
+    background:#634ce7;
+    color: #fff;
+}
+
+.summary-card span {
+    display: block;
+    color: #64748b;
+    font-size: .9rem;
+    margin-bottom: 6px;
+}
+
+.summary-card h3 {
+    color: #12121a;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+/* Card Variants */
+
+.summary-card.accepted svg {
+    background: linear-gradient(135deg,#16a34a,#22c55e);
+}
+
+.summary-card.pending svg {
+    background: linear-gradient(135deg,#f59e0b,#fbbf24);
+}
+
+.summary-card.rejected svg {
+    background: linear-gradient(135deg,#dc2626,#ef4444);
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.summary-table-wrapper {
+    background: #fff;
+    border-radius: 22px;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 15px 35px rgba(15,23,42,.06);
+
+    max-height: 520px;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+/* Scrollbar */
+
+.summary-table-wrapper::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.summary-table-wrapper::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 20px;
+}
+
+.summary-table-wrapper::-webkit-scrollbar-thumb {
+    background:#12121a;
+    border-radius: 20px;
+}
+
+.summary-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #00b2ff;
+}
+
+.summary-table {
+    width: 100%;
+    min-width: 950px;
+    border-collapse: collapse;
+}
+
+.summary-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background:#12121a;
+}
+
+.summary-table thead th {
+    color: white;
+    padding: 18px;
+    text-align: left;
+    font-size: .95rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.summary-table tbody tr {
+    transition: .2s;
+    border-bottom: 1px solid #edf2f7;
+    background: #fff;
+}
+
+.summary-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+.summary-table td {
+    padding: 18px;
+    color: #334155;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.summary-table td strong {
+    color: #12121a;
+    font-size: 1rem;
+}
+
+.summary-table td small {
+    color: #64748b;
+}
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 14px;
+    border-radius: 50px;
+    font-size: .82rem;
+    font-weight: 600;
+}
+
+.status.accepted {
+    background: rgba(22,163,74,.12);
+    color: #15803d;
+}
+
+.status.pending {
+    background: rgba(245,158,11,.14);
+    color: #b45309;
+}
+
+.status.empty {
+    background: #eef2f7;
+    color: #64748b;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-summary {
+    text-align: center;
+    padding: 60px;
+    color: #94a3b8;
+    font-size: 1rem;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width:1100px) {
+
+    .summary-cards {
+        grid-template-columns: repeat(2,1fr);
+    }
+
+}
+
+@media (max-width:768px) {
+
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-table-wrapper {
+        max-height: 450px;
+    }
+
+    .summary-table {
+        min-width: 850px;
+    }
+
+}
+
+@media (max-width:480px) {
+
+    .summary-header h2 {
+        font-size: 1.6rem;
+    }
+
+    .summary-card {
+        padding: 18px;
+    }
+
+    .summary-card h3 {
+        font-size: 1.6rem;
+    }
+
+    .summary-table-wrapper {
+        max-height: 400px;
+    }
+
+    .summary-table {
+        min-width: 760px;
+    }
+
+}
