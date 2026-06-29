@@ -1,3 +1,7 @@
+import { useEffect, useState } from "react";
+import { api } from "../services/api";
+import { useNavigate } from "react-router-dom";
+
 import Sidebar from "../components/dashboard/Sidebar";
 import StatsCards from "../components/dashboard/StatsCards";
 import JobsTable from "../components/dashboard/JobsTable";
@@ -5,16 +9,53 @@ import ActivityTimeline from "../components/dashboard/ActivityTimeline";
 import EscrowOverview from "../components/dashboard/EscrowOverview";
 import ProjectsChart from "../components/dashboard/ProjectsChart";
 import PostJobModal from "../components/jobs/PostJobModal";
-import { useState } from "react";
 import "../styles/dashboard.css";
 import QuotationsPage from "../components/customer/quotations/QuotationsPage";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
-import { PanelLeft } from "lucide-react";
+
+function getStoredUser() {
+  try {
+    return JSON.parse(localStorage.getItem("user"));
+  } catch {
+    return null;
+  }
+}
 
 export default function CustomerDashboard() {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const user = getStoredUser();
+    const token = localStorage.getItem("access");
+
+    // Not logged in
+    if (!token || !user) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    // Only customers can access this dashboard
+    if (user.user_type !== "customer") {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    // Must have an associated customer profile on backend
+    const validateProfile = async () => {
+      try {
+        // Endpoint expected to respond 404/empty if profile missing
+        await api.get("customerprofile/");
+      } catch (e) {
+        navigate("/login", { replace: true });
+      }
+    };
+
+    validateProfile();
+  }, [navigate]);
+
   return (
     <>
       <div className="dashboard-layout">
@@ -99,3 +140,4 @@ export default function CustomerDashboard() {
     </>
   );
 }
+

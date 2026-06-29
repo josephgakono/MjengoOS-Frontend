@@ -24,17 +24,34 @@ export async function buildQuotationData(quotations = [], jobs = []) {
     const usersMap = {};
 
     (users || []).forEach((user) => {
-      usersMap[user.id] = user;
+      // backend may return either user id references or expanded objects
+      if (user && user.id != null) usersMap[user.id] = user;
+      if (user && user.username) usersMap[user.username] = user;
     });
 
     const workersMap = {};
 
     (workers || []).forEach((worker) => {
+      const resolvedUser =
+        usersMap[worker.user] ||
+        usersMap[worker.user?.id] ||
+        usersMap[worker.user?.username] ||
+        null;
+
+      // also index by both worker id and worker.user username if needed
       workersMap[worker.id] = {
         ...worker,
-        user: usersMap[worker.user] || null,
+        user: resolvedUser,
       };
+
+      if (resolvedUser?.username) {
+        workersMap[resolvedUser.username] = {
+          ...worker,
+          user: resolvedUser,
+        };
+      }
     });
+
 
     //--------------------------------------------------
     // Merge quotation + job + worker

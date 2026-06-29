@@ -1,177 +1,143 @@
-import { useEffect, useMemo, useState } from "react";
-import { Eye, MapPin, Clock3, Wallet, BadgeCheck } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Eye, MapPin, CalendarDays, Wallet, Clock3, User } from "lucide-react";
+import "../../../styles/quotationReview.css";
 
 import QuotationModal from "./QuotationModal";
-import { buildQuotationData } from "../../../utils/quotationHelpers";
 
-export default function QuotationReview({ quotations, jobs, refreshData }) {
-  const [quotationData, setQuotationData] = useState([]);
+export default function QuotationReview({ jobs, quotations, refreshData }) {
   const [selectedQuotation, setSelectedQuotation] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
 
-  const [loading, setLoading] = useState(true);
-
-  //-------------------------------------------------
-  // Build quotation objects
-  //-------------------------------------------------
-
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-
-      const data = await buildQuotationData(quotations, jobs);
-
-      setQuotationData(data);
-      setLoading(false);
-    }
-
-    load();
-  }, [quotations, jobs]);
-
-  //-------------------------------------------------
-  // Pending quotations only
-  //-------------------------------------------------
-
-  const pendingQuotations = useMemo(() => {
-    return quotationData.filter((quote) => quote.status === "pending");
-  }, [quotationData]);
-
-  //-------------------------------------------------
-  // Loading
-  //-------------------------------------------------
-
-  if (loading) {
-    return (
-      <div className="quotation-review-card">
-        <div className="quotation-review-header">
-          <h2>Review Quotations</h2>
-        </div>
-
-        <div className="quotation-loading">Loading quotations...</div>
-      </div>
-    );
-  }
-
-  //-------------------------------------------------
-  // Empty State
-  //-------------------------------------------------
-
-  if (pendingQuotations.length === 0) {
-    return (
-      <div className="quotation-review-card">
-        <div className="quotation-review-header">
-          <div>
-            <h2>Review Quotations</h2>
-
-            <p>Review incoming quotations from skilled workers.</p>
-          </div>
-        </div>
-
-        <div className="quotation-empty">
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/7486/7486740.png"
-            alt=""
-          />
-
-          <h3>No quotations yet</h3>
-
-          <p>Workers haven't submitted any quotations for your jobs yet.</p>
-        </div>
-      </div>
-    );
-  }
-
-  //-------------------------------------------------
-  // UI
-  //-------------------------------------------------
+  const jobsWithQuotations = useMemo(() => {
+    return jobs.map((job) => ({
+      ...job,
+      quotations: quotations.filter(
+        (quotation) => quotation.job?.id === job.id,
+      ),
+    }));
+  }, [jobs, quotations]);
 
   return (
     <>
-      <div className="quotation-review-card">
-        <div className="quotation-review-header">
+      <section className="quotation-review-section">
+        <div className="section-header">
           <div>
             <h2>Review Quotations</h2>
-
-            <p>
-              {pendingQuotations.length} quotation
-              {pendingQuotations.length > 1 ? "s" : ""} awaiting your review.
-            </p>
+            <p>Compare contractors before accepting a quotation.</p>
           </div>
         </div>
 
-        <div className="quotation-review-grid">
-          {pendingQuotations.map((quotation) => {
-            const worker = quotation.worker;
-            const job = quotation.job;
+        {jobsWithQuotations.length === 0 && (
+          <div className="empty-state">
+            <h3>No jobs found</h3>
+            <p>Post a job to begin receiving quotations.</p>
+          </div>
+        )}
 
-            const avatar =
-              worker?.user?.profile_picture ||
-              `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                worker?.user?.username || "Worker",
-              )}&background=634ce7&color=fff`;
+        {jobsWithQuotations.map((job) => (
+          <div key={job.id} className="job-quotation-card">
+            <div className="job-header">
+              <div>
+                <h3>{job.title}</h3>
 
-            return (
-              <div className="quotation-card" key={quotation.id}>
-                <div className="quotation-card-top">
-                  <img
-                    src={avatar}
-                    alt={worker?.user?.username}
-                    className="quotation-avatar"
-                  />
+                <div className="job-meta">
+                  <span>
+                    <MapPin size={15} />
+                    {job.location}
+                  </span>
 
-                  <div>
-                    <h3>{worker?.user?.username}</h3>
+                  <span>
+                    <Wallet size={15} />
+                    KES {Number(job.budget).toLocaleString()}
+                  </span>
 
-                    <p>{worker?.profession}</p>
-                  </div>
-
-                  {worker?.verified && (
-                    <span className="verified-chip">
-                      <BadgeCheck size={15} />
-                    </span>
-                  )}
+                  <span>
+                    <CalendarDays size={15} />
+                    {new Date(job.created_at).toLocaleDateString()}
+                  </span>
                 </div>
-
-                <div className="quotation-job">
-                  <strong>{job?.title}</strong>
-                </div>
-
-                <div className="quotation-meta">
-                  <div>
-                    <Wallet size={16} />
-
-                    <span>KES {Number(quotation.amount).toLocaleString()}</span>
-                  </div>
-
-                  <div>
-                    <Clock3 size={16} />
-
-                    <span>{quotation.estimated_days} days</span>
-                  </div>
-
-                  <div>
-                    <MapPin size={16} />
-
-                    <span>{worker?.location}</span>
-                  </div>
-                </div>
-
-                <button
-                  className="review-btn"
-                  onClick={() => setSelectedQuotation(quotation)}
-                >
-                  <Eye size={18} />
-                  View Details
-                </button>
               </div>
-            );
-          })}
-        </div>
-      </div>
+
+              <div className="quotation-count">
+                {job.quotations.length} Quotation
+                {job.quotations.length !== 1 && "s"}
+              </div>
+            </div>
+
+            {job.quotations.length === 0 ? (
+              <div className="empty-job">No quotations received yet.</div>
+            ) : (
+              <div className="quotation-grid">
+                {job.quotations.map((quotation) => (
+                  <div key={quotation.id} className="quotation-card">
+                    <div className="quotation-worker">
+                      <img
+                        src={
+                          quotation.worker?.user?.profile_picture ||
+                          `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            quotation.worker?.user?.username || "Worker",
+                          )}`
+                        }
+                        alt=""
+                      />
+
+                      <div>
+                        <h4>{quotation.worker?.user?.username}</h4>
+
+                        <span>{quotation.worker?.profession}</span>
+                      </div>
+                    </div>
+
+                    <div className="quotation-details">
+                      <div>
+                        <Wallet size={16} />
+                        <span>
+                          KES {Number(quotation.amount).toLocaleString()}
+                        </span>
+                      </div>
+
+                      <div>
+                        <Clock3 size={16} />
+                        <span>{quotation.estimated_days} Days</span>
+                      </div>
+
+                      <div>
+                        <User size={16} />
+                        <span>
+                          {quotation.worker?.experience_years} Years Experience
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className={`quotation-status ${quotation.status}`}>
+                      {quotation.status}
+                    </div>
+
+                    <button
+                      className="view-quotation-btn"
+                      onClick={() => {
+                        setSelectedQuotation(quotation);
+                        setOpenModal(true);
+                      }}
+                    >
+                      <Eye size={18} />
+                      View Details
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </section>
 
       <QuotationModal
         quotation={selectedQuotation}
-        isOpen={selectedQuotation !== null}
-        onClose={() => setSelectedQuotation(null)}
+        isOpen={openModal}
+        onClose={() => {
+          setOpenModal(false);
+          setSelectedQuotation(null);
+        }}
         onUpdated={refreshData}
       />
     </>
