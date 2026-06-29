@@ -27,7 +27,29 @@ async function request(endpoint, method = "GET", body = null) {
     return;
   }
 
-  return res.json();
+  // Success path
+  if (res.ok) {
+    // Some endpoints might return empty responses.
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
+  }
+
+  // Error path
+  let data;
+  try {
+    const text = await res.text();
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = null;
+  }
+
+  const err = new Error(
+    data?.message || data?.error || `Request failed with status ${res.status}`
+  );
+  err.status = res.status;
+  err.endpoint = endpoint;
+  err.data = data;
+  throw err;
 }
 
 export const api = {
