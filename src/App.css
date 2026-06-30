@@ -264,7 +264,6 @@ body {
   padding-right: 2px;
 }
 
-.navbar__user-text {}
 
 .navbar__profile-label {
   color: rgba(18, 18, 26, 0.62);
@@ -1505,10 +1504,10 @@ body {
 /*=========================================================
     RESPONSIVE
 =========================================================*/
-@media (max-width:1200px) {
-  .jobs-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+@media (max-width:1200px){
+    .jobs-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
 }
 
 @media(max-width:992px) {
@@ -1612,7 +1611,7 @@ body {
 
 .quote-popup button {
   border: none;
-  background:#ff9a00;
+  background: #ff9a00;
   color: #fff;
   padding: 13px 28px;
   border-radius: 12px;

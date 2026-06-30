@@ -1,158 +1,177 @@
-import { useMemo, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useMemo, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
-const API_BASE_URL = 'https://mjengoos.onrender.com'
+const API_BASE_URL = "https://mjengoos.onrender.com";
 
 const initialForm = {
-  username: '',
-  email: '',
-  phone: '',
-  password: '',
-  confirmPassword: '',
-  user_type: 'customer',
-}
-
+  username: "",
+  first_name: "",
+  last_name: "",
+  email: "",
+  phone: "",
+  password: "",
+  confirmPassword: "",
+  user_type: "customer",
+  profile_picture: null,
+};
 function getErrorMessage(errorData) {
-  if (!errorData) return 'Something went wrong. Please try again.'
+  if (!errorData) return "Something went wrong. Please try again.";
 
-  if (typeof errorData === 'string') return errorData
+  if (typeof errorData === "string") return errorData;
 
-  if (errorData.detail) return errorData.detail
+  if (errorData.detail) return errorData.detail;
 
-  const firstKey = Object.keys(errorData)[0]
-  const firstValue = errorData[firstKey]
+  const firstKey = Object.keys(errorData)[0];
+  const firstValue = errorData[firstKey];
 
   if (Array.isArray(firstValue)) {
-    return `${firstKey}: ${firstValue.join(' ')}`
+    return `${firstKey}: ${firstValue.join(" ")}`;
   }
 
-  if (typeof firstValue === 'string') {
-    return `${firstKey}: ${firstValue}`
+  if (typeof firstValue === "string") {
+    return `${firstKey}: ${firstValue}`;
   }
 
-  return 'Please check your details and try again.'
+  return "Please check your details and try again.";
 }
 
 function saveAuth({ tokens, user }) {
-  localStorage.setItem('access', tokens.access)
-  localStorage.setItem('refresh', tokens.refresh)
-  localStorage.setItem('user', JSON.stringify(user))
-  window.dispatchEvent(new Event('storage'))
+  localStorage.setItem("access", tokens.access);
+  localStorage.setItem("refresh", tokens.refresh);
+  localStorage.setItem("user", JSON.stringify(user));
+  window.dispatchEvent(new Event("storage"));
 }
 
 function Auth() {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const mode = location.pathname === '/signup' ? 'signup' : 'login'
-  const isSignup = mode === 'signup'
-  const [form, setForm] = useState(initialForm)
-  const [status, setStatus] = useState({ type: '', message: '' })
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const location = useLocation();
+  const navigate = useNavigate();
+  const mode = location.pathname === "/signup" ? "signup" : "login";
+  const isSignup = mode === "signup";
+  const [form, setForm] = useState(initialForm);
+  const [status, setStatus] = useState({ type: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const pageCopy = useMemo(
     () =>
       isSignup
         ? {
-            eyebrow: 'Create your MjengoOS account',
-            title: 'Start hiring or winning construction work.',
-            lead: 'Join as a customer to post jobs or as a worker to send quotations and manage projects.',
-            button: 'Create Account',
-            switchText: 'Already have an account?',
-            switchLink: 'Log in',
-            switchPath: '/login',
+            eyebrow: "Create your MjengoOS account",
+            title: "Start hiring or winning construction work.",
+            lead: "Join as a customer to post jobs or as a worker to send quotations and manage projects.",
+            button: "Create Account",
+            switchText: "Already have an account?",
+            switchLink: "Log in",
+            switchPath: "/login",
           }
         : {
-            eyebrow: 'Welcome back',
-            title: 'Log in to manage your construction work.',
-            lead: 'Access your jobs, quotations, projects, payments, updates, and messages.',
-            button: 'Log In',
-            switchText: 'New to MjengoOS?',
-            switchLink: 'Create an account',
-            switchPath: '/signup',
+            eyebrow: "Welcome back",
+            title: "Log in to manage your construction work.",
+            lead: "Access your jobs, quotations, projects, payments, updates, and messages.",
+            button: "Log In",
+            switchText: "New to MjengoOS?",
+            switchLink: "Create an account",
+            switchPath: "/signup",
           },
     [isSignup],
-  )
+  );
 
   const updateField = (event) => {
-    const { name, value } = event.target
-    setForm((current) => ({ ...current, [name]: value }))
-  }
+    const { name, value, files } = event.target;
 
-  const requestJson = async (endpoint, payload) => {
+    setForm((current) => ({
+      ...current,
+      [name]: files ? files[0] : value,
+    }));
+  };
+
+  const requestData = async (endpoint, payload, isFormData = false) => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
+      method: "POST",
+      headers: isFormData
+        ? {}
+        : {
+            "Content-Type": "application/json",
+          },
+      body: isFormData ? payload : JSON.stringify(payload),
+    });
 
-    const data = await response.json().catch(() => null)
+    const data = await response.json().catch(() => null);
 
     if (!response.ok) {
-      throw new Error(getErrorMessage(data))
+      throw new Error(getErrorMessage(data));
     }
 
-    return data
-  }
+    return data;
+  };
 
   const login = async ({ username, password, user }) => {
-    const tokens = await requestJson('/api/token/', { username, password })
+    const tokens = await requestData("/api/token/", { username, password });
     saveAuth({
       tokens,
       user: {
+        id: user?.id,
         username,
-        user_type: user?.user_type || form.user_type,
+        first_name: user?.first_name || form.first_name,
+        last_name: user?.last_name || form.last_name,
         email: user?.email || form.email,
         phone: user?.phone || form.phone,
-        profile_image: user?.profile_picture || '',
+        user_type: user?.user_type || form.user_type,
+        profile_picture: user?.profile_picture || "",
       },
-    })
-  }
+    });
+  };
 
   const handleSubmit = async (event) => {
-    event.preventDefault()
-    setStatus({ type: '', message: '' })
+    event.preventDefault();
+    setStatus({ type: "", message: "" });
 
     if (isSignup && form.password !== form.confirmPassword) {
-      setStatus({ type: 'error', message: 'Passwords do not match.' })
-      return
+      setStatus({ type: "error", message: "Passwords do not match." });
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       if (isSignup) {
-        const user = await requestJson('/signup/', {
-          username: form.username.trim(),
-          email: form.email.trim(),
-          phone: form.phone.trim(),
-          password: form.password,
-          user_type: form.user_type,
-        })
+        const formData = new FormData();
+
+        formData.append("username", form.username.trim());
+        formData.append("first_name", form.first_name.trim());
+        formData.append("last_name", form.last_name.trim());
+        formData.append("email", form.email.trim());
+        formData.append("phone", form.phone.trim());
+        formData.append("password", form.password);
+        formData.append("user_type", form.user_type);
+
+        if (form.profile_picture) {
+          formData.append("profile_picture", form.profile_picture);
+        }
+
+        const user = await requestData("/signup/", formData, true);
 
         await login({
           username: form.username.trim(),
           password: form.password,
           user,
-        })
+        });
       } else {
         await login({
           username: form.username.trim(),
           password: form.password,
-        })
+        });
       }
 
-      navigate('/dashboard')
+      navigate("/dashboard");
     } catch (error) {
       setStatus({
-        type: 'error',
-        message: error.message || 'Unable to complete this request.',
-      })
+        type: "error",
+        message: error.message || "Unable to complete this request.",
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <main className="auth-page">
@@ -172,9 +191,9 @@ function Auth() {
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-form__header">
-            <strong>{isSignup ? 'Sign up' : 'Login'}</strong>
+            <strong>{isSignup ? "Sign up" : "Login"}</strong>
             <span>
-              {pageCopy.switchText}{' '}
+              {pageCopy.switchText}{" "}
               <Link to={pageCopy.switchPath}>{pageCopy.switchLink}</Link>
             </span>
           </div>
@@ -193,6 +212,27 @@ function Auth() {
 
           {isSignup && (
             <>
+              <label className="auth-field">
+                <span>First Name</span>
+                <input
+                  name="first_name"
+                  type="text"
+                  value={form.first_name}
+                  onChange={updateField}
+                  required
+                />
+              </label>
+
+              <label className="auth-field">
+                <span>Last Name</span>
+                <input
+                  name="last_name"
+                  type="text"
+                  value={form.last_name}
+                  onChange={updateField}
+                  required
+                />
+              </label>
               <label className="auth-field">
                 <span>Email</span>
                 <input
@@ -220,11 +260,27 @@ function Auth() {
 
               <label className="auth-field">
                 <span>Account Type</span>
-                <select name="user_type" value={form.user_type} onChange={updateField} required>
+                <select
+                  name="user_type"
+                  value={form.user_type}
+                  onChange={updateField}
+                  required
+                >
                   <option value="customer">Customer</option>
                   <option value="worker">Worker</option>
                   <option value="contractor">Contractor</option>
                 </select>
+              </label>
+
+              <label className="auth-field">
+                <span>Profile Picture (Optional)</span>
+
+                <input
+                  type="file"
+                  name="profile_picture"
+                  accept="image/*"
+                  onChange={updateField}
+                />
               </label>
             </>
           )}
@@ -236,7 +292,7 @@ function Auth() {
               type="password"
               value={form.password}
               onChange={updateField}
-              autoComplete={isSignup ? 'new-password' : 'current-password'}
+              autoComplete={isSignup ? "new-password" : "current-password"}
               minLength={8}
               required
             />
@@ -258,18 +314,25 @@ function Auth() {
           )}
 
           {status.message && (
-            <p className={`auth-form__status auth-form__status--${status.type}`} role="alert">
+            <p
+              className={`auth-form__status auth-form__status--${status.type}`}
+              role="alert"
+            >
               {status.message}
             </p>
           )}
 
-          <button className="auth-form__button" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Please wait...' : pageCopy.button}
+          <button
+            className="auth-form__button"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Please wait..." : pageCopy.button}
           </button>
         </form>
       </section>
     </main>
-  )
+  );
 }
 
-export default Auth
+export default Auth;
