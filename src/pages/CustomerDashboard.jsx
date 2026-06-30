@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
-
+import Profile from "../components/customer/Profile";
 import Sidebar from "../components/dashboard/Sidebar";
 import StatsCards from "../components/dashboard/StatsCards";
 import JobsTable from "../components/dashboard/JobsTable";
@@ -128,6 +128,17 @@ export default function CustomerDashboard() {
               <QuotationsPage />
             </>
           )}
+
+          {activeTab === "profile" && (
+            <>
+              <DashboardHeader
+                title="My Profile"
+                subtitle="View and manage your account information."
+                setSidebarOpen={setSidebarOpen}
+              />
+              <Profile />
+            </>
+          )}
         </main>
       </div>
       <PostJobModal
@@ -140,4 +151,3 @@ export default function CustomerDashboard() {
     </>
   );
 }
-

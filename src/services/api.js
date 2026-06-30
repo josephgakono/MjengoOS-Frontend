@@ -54,7 +54,56 @@ async function request(endpoint, method = "GET", body = null) {
 
 export const api = {
   get: (url) => request(url),
+
   post: (url, data) => request(url, "POST", data),
+
   patch: (url, data) => request(url, "PATCH", data),
+
   delete: (url) => request(url, "DELETE"),
+
+  upload: async (url, formData, method = "PATCH") => {
+    const res = await fetch(BASE_URL + url, {
+      method,
+      headers: {
+        Authorization: getToken()
+          ? `Bearer ${getToken()}`
+          : "",
+      },
+      body: formData,
+    });
+
+    if (res.status === 401) {
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+      return;
+    }
+
+    if (res.ok) {
+      const text = await res.text();
+      return text ? JSON.parse(text) : null;
+    }
+
+    let data;
+    try {
+      const text = await res.text();
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      data = null;
+    }
+
+    const err = new Error(
+      data?.message ||
+      data?.error ||
+      `Request failed with status ${res.status}`
+    );
+
+    err.status = res.status;
+    err.endpoint = url;
+    err.data = data;
+
+    throw err;
+  },
 };
