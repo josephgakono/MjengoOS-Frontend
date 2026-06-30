@@ -1,21 +1,15 @@
 import { useEffect, useState } from "react";
-import { Camera, User, Mail, Phone, MapPin, Shield, Save } from "lucide-react";
+import { Camera } from "lucide-react";
 
 import { api } from "../../services/api";
 
 import "../../styles/profile.css";
 
 export default function Profile() {
-  //--------------------------------------------------
-  // State
-  //--------------------------------------------------
-
   const [loading, setLoading] = useState(true);
-
   const [saving, setSaving] = useState(false);
 
   const [success, setSuccess] = useState("");
-
   const [error, setError] = useState("");
 
   const [user, setUser] = useState({
@@ -29,24 +23,24 @@ export default function Profile() {
   });
 
   const [profile, setProfile] = useState({
+    id: null,
     location: "",
-    preferred_contact: "",
+    preferred_contact: "Phone",
   });
-
-  //--------------------------------------------------
-  // Load Data
-  //--------------------------------------------------
 
   useEffect(() => {
     async function loadData() {
       try {
         const userData = await api.get("me/");
-
         const profileData = await api.get("customerprofile/");
 
         setUser(userData);
 
-        setProfile(profileData[0]);
+        if (Array.isArray(profileData)) {
+          setProfile(profileData[0]);
+        } else {
+          setProfile(profileData);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -56,10 +50,6 @@ export default function Profile() {
 
     loadData();
   }, []);
-
-  //--------------------------------------------------
-  // Inputs
-  //--------------------------------------------------
 
   function handleUser(e) {
     setUser({
@@ -75,10 +65,6 @@ export default function Profile() {
     });
   }
 
-  //--------------------------------------------------
-  // Image
-  //--------------------------------------------------
-
   function handleImage(e) {
     const file = e.target.files[0];
 
@@ -90,26 +76,25 @@ export default function Profile() {
     });
   }
 
-  //--------------------------------------------------
-  // Save
-  //--------------------------------------------------
+  function removePhoto() {
+    setUser({
+      ...user,
+      profile_picture: "",
+    });
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
 
     setSaving(true);
-
     setSuccess("");
-
     setError("");
 
     try {
       const formData = new FormData();
 
       formData.append("first_name", user.first_name);
-
       formData.append("last_name", user.last_name);
-
       formData.append("phone", user.phone);
 
       if (user.profile_picture instanceof File) {
@@ -126,174 +111,159 @@ export default function Profile() {
       setSuccess("Profile updated successfully.");
     } catch (err) {
       console.error(err);
-
       setError("Unable to update profile.");
     } finally {
       setSaving(false);
     }
   }
 
-  //--------------------------------------------------
-  // Loading
-  //--------------------------------------------------
-
   if (loading) {
-    return <div className="profile-loading">Loading profile...</div>;
+    return <div className="profile-page">Loading profile...</div>;
   }
-
-  //--------------------------------------------------
-  // JSX
-  //--------------------------------------------------
 
   return (
     <div className="profile-page">
-      <div className="profile-header">
-        <h2>Profile</h2>
-
-        <p>Manage your personal information and account settings.</p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="profile-grid">
-        {/* Left */}
-
-        <div className="profile-card profile-sidebar">
-          <div className="avatar-wrapper">
-            {user.profile_picture ? (
-              <img
-                src={
-                  user.profile_picture instanceof File
-                    ? URL.createObjectURL(user.profile_picture)
-                    : user.profile_picture
-                }
-                alt=""
-              />
-            ) : (
-              <User size={70} />
-            )}
-
-            <label className="change-photo">
-              <Camera size={18} />
-              Change Photo
-              <input
-                type="file"
-                hidden
-                accept="image/*"
-                onChange={handleImage}
-              />
-            </label>
-          </div>
-
-          <h3>
-            {user.first_name} {user.last_name}
-          </h3>
-
-          <span>{user.user_type}</span>
-
-          <div className="profile-location">
-            <MapPin size={18} />
-
-            {profile.location || "No location"}
-          </div>
+      <div className="profile-card">
+        <div className="profile-header">
+          <h2>Personal Information</h2>
         </div>
 
-        {/* Right */}
+        <div className="profile-body">
+          {success && <div className="profile-success">{success}</div>}
 
-        <div className="profile-card">
-          <div className="profile-form-grid">
-            <Input
-              icon={<User size={18} />}
-              label="First Name"
-              name="first_name"
-              value={user.first_name}
-              onChange={handleUser}
-            />
+          {error && <div className="profile-error">{error}</div>}
 
-            <Input
-              icon={<User size={18} />}
-              label="Last Name"
-              name="last_name"
-              value={user.last_name}
-              onChange={handleUser}
-            />
+          <form onSubmit={handleSubmit}>
+            <div className="profile-image-section">
+              {user.profile_picture ? (
+                <img
+                  className="profile-avatar"
+                  src={
+                    user.profile_picture instanceof File
+                      ? URL.createObjectURL(user.profile_picture)
+                      : user.profile_picture
+                  }
+                  alt=""
+                />
+              ) : (
+                <img
+                  className="profile-avatar"
+                  src="https://ui-avatars.com/api/?name=User&background=00b2ff&color=fff&size=256"
+                  alt=""
+                />
+              )}
 
-            <Input
-              icon={<User size={18} />}
-              label="Username"
-              value={user.username}
-              disabled
-            />
+              <div className="profile-image-actions">
+                <label className="upload-btn">
+                  Upload
+                  <input
+                    hidden
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImage}
+                  />
+                </label>
 
-            <Input
-              icon={<Mail size={18} />}
-              label="Email"
-              value={user.email}
-              disabled
-            />
+                <button
+                  type="button"
+                  className="remove-btn"
+                  onClick={removePhoto}
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
 
-            <Input
-              icon={<Phone size={18} />}
-              label="Phone"
-              name="phone"
-              value={user.phone}
-              onChange={handleUser}
-            />
+            <div className="profile-form">
+              <div className="form-group">
+                <label>
+                  First Name <span>*</span>
+                </label>
 
-            <Input
-              icon={<Shield size={18} />}
-              label="User Type"
-              value={user.user_type}
-              disabled
-            />
-          </div>
+                <input
+                  name="first_name"
+                  value={user.first_name}
+                  onChange={handleUser}
+                />
+              </div>
 
-          <div className="input-group">
-            <label>Location</label>
+              <div className="form-group">
+                <label>
+                  Last Name <span>*</span>
+                </label>
 
-            <input
-              name="location"
-              value={profile.location}
-              onChange={handleProfile}
-            />
-          </div>
+                <input
+                  name="last_name"
+                  value={user.last_name}
+                  onChange={handleUser}
+                />
+              </div>
 
-          <div className="input-group">
-            <label>Preferred Contact</label>
+              <div className="form-group">
+                <label>
+                  Email <span>*</span>
+                </label>
 
-            <select
-              name="preferred_contact"
-              value={profile.preferred_contact}
-              onChange={handleProfile}
-            >
-              <option>Phone</option>
+                <input value={user.email} disabled />
+              </div>
 
-              <option>Email</option>
-            </select>
-          </div>
+              <div className="form-group">
+                <label>
+                  Username <span>*</span>
+                </label>
 
-          {success && <div className="success-message">{success}</div>}
+                <input value={user.username} disabled />
+              </div>
 
-          {error && <div className="error-message">{error}</div>}
+              <div className="form-group">
+                <label>
+                  User Type <span>*</span>
+                </label>
 
-          <button className="save-profile-btn" disabled={saving}>
-            <Save size={18} />
+                <input value={user.user_type} disabled />
+              </div>
 
-            {saving ? "Saving..." : "Save Changes"}
-          </button>
+              <div className="form-group">
+                <label>
+                  Phone Number <span>*</span>
+                </label>
+
+                <input name="phone" value={user.phone} onChange={handleUser} />
+              </div>
+
+              <div className="form-group full-width">
+                <label>
+                  Location <span>*</span>
+                </label>
+
+                <input
+                  name="location"
+                  value={profile.location}
+                  onChange={handleProfile}
+                />
+              </div>
+
+              <div className="form-group full-width">
+                <label>Preferred Contact</label>
+
+                <select
+                  name="preferred_contact"
+                  value={profile.preferred_contact}
+                  onChange={handleProfile}
+                >
+                  <option value="Phone">Phone</option>
+                  <option value="Email">Email</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="profile-footer">
+              <button className="save-btn" disabled={saving}>
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
-    </div>
-  );
-}
-
-function Input({ icon, label, ...props }) {
-  return (
-    <div className="input-group">
-      <label>{label}</label>
-
-      <div className="input-icon">
-        {icon}
-
-        <input {...props} />
       </div>
     </div>
   );
