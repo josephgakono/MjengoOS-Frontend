@@ -12,23 +12,11 @@ import ChatModal from "./ChatModal";
 import "../../styles/Messages.css";
 
 export default function DashboardMessages() {
-  //------------------------------------------------------
-  // State
-  //------------------------------------------------------
-
   const [loading, setLoading] = useState(true);
-
   const [workers, setWorkers] = useState([]);
-
   const [search, setSearch] = useState("");
-
   const [selectedWorker, setSelectedWorker] = useState(null);
-
   const [showChat, setShowChat] = useState(false);
-
-  //------------------------------------------------------
-  // Load Workers
-  //------------------------------------------------------
 
   useEffect(() => {
     loadWorkers();
@@ -38,92 +26,118 @@ export default function DashboardMessages() {
     setLoading(true);
 
     try {
-      //----------------------------------
-      // Fetch related endpoints together
-      //----------------------------------
+      const [jobs, projects, quotations, usersResponse] =
+        await Promise.all([
+          api.get("jobs/"),
+          api.get("projects/"),
+          api.get("quotations/"),
+          api.get("users/"),
+        ]);
 
-      const [jobs, projects, quotations] = await Promise.all([
-        api.get("jobs/"),
-        api.get("projects/"),
-        api.get("quotations/"),
-      ]);
+      const users = Array.isArray(usersResponse)
+        ? usersResponse
+        : usersResponse.results || [];
 
-      //----------------------------------
-      // Collect worker ids
-      //----------------------------------
+      //---------------------------------------
+      // Collect WorkerProfile IDs
+      //---------------------------------------
 
-      const workerIds = new Set();
+      const workerProfileIds = new Set();
 
-      const collectWorker = (worker) => {
-        if (!worker) return;
+      const collect = (value) => {
+        if (!value) return;
 
-        if (typeof worker === "number") {
-          workerIds.add(worker);
-        } else if (worker.id) {
-          workerIds.add(worker.id);
+        if (typeof value === "number") {
+          workerProfileIds.add(value);
+        } else if (value.id) {
+          workerProfileIds.add(value.id);
         }
       };
 
       (jobs || []).forEach((job) => {
-        collectWorker(job.worker);
-        collectWorker(job.assigned_worker);
+        collect(job.worker);
+        collect(job.assigned_worker);
       });
 
       (projects || []).forEach((project) => {
-        collectWorker(project.worker);
-        collectWorker(project.contractor);
+        collect(project.worker);
+        collect(project.contractor);
       });
 
       (quotations || []).forEach((quotation) => {
-        collectWorker(quotation.worker);
+        collect(quotation.worker);
       });
 
-      //----------------------------------
-      // Fetch every worker profile
-      //----------------------------------
+      //---------------------------------------
+      // Load Worker Profiles
+      //---------------------------------------
 
       const profiles = await Promise.all(
-        [...workerIds].map(async (id) => {
+        [...workerProfileIds].map(async (id) => {
           try {
             return await api.get(`workerprofile/${id}/`);
           } catch {
             return null;
           }
-        }),
+        })
       );
 
-      //----------------------------------
-      // Clean Data
-      //----------------------------------
+      //---------------------------------------
+      // Match WorkerProfile -> User
+      //---------------------------------------
 
-      const list = profiles
+      const mappedWorkers = profiles
         .filter(Boolean)
-        .map((profile) => ({
-          id: profile.id,
-          workerId: profile.user?.id,
-          username: profile.user?.username,
-          first_name: profile.user?.first_name,
-          last_name: profile.user?.last_name,
-          profile_picture:
-            profile.user?.profile_picture || "",
-          profession: profile.profession,
-        }));
+        .map((profile) => {
+          const user = users.find(
+            (u) => u.id === profile.user
+          );
 
-      list.sort((a, b) =>
-        (a.username || "").localeCompare(b.username || ""),
+          if (!user) return null;
+
+          return {
+            id: profile.id,                 // WorkerProfile ID
+            userId: user.id,                // User ID (used for messages)
+
+            username: user.username,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+
+            profile_picture:
+              user.profile_picture || "",
+
+            profession: profile.profession,
+          };
+        })
+        .filter(Boolean);
+
+      //---------------------------------------
+      // Remove duplicates by User ID
+      //---------------------------------------
+
+      const uniqueWorkers = [];
+
+      const seen = new Set();
+
+      mappedWorkers.forEach((worker) => {
+        if (!seen.has(worker.userId)) {
+          seen.add(worker.userId);
+          uniqueWorkers.push(worker);
+        }
+      });
+
+      uniqueWorkers.sort((a, b) =>
+        a.username.localeCompare(b.username)
       );
 
-      setWorkers(list);
+      setWorkers(uniqueWorkers);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
   }
-
-  //------------------------------------------------------
-  // Filter
-  //------------------------------------------------------
 
   const filteredWorkers = useMemo(() => {
     if (!search.trim()) return workers;
@@ -135,39 +149,23 @@ export default function DashboardMessages() {
         `${worker.first_name} ${worker.last_name}`.toLowerCase();
 
       return (
-        worker.username?.toLowerCase().includes(value) ||
+        worker.username.toLowerCase().includes(value) ||
         full.includes(value)
       );
     });
   }, [workers, search]);
 
-  //------------------------------------------------------
-  // Avatar
-  //------------------------------------------------------
-
   function initials(worker) {
-    const first = worker.first_name?.charAt(0) || "";
-    const last = worker.last_name?.charAt(0) || "";
+    const first = worker.first_name?.[0] || "";
+    const last = worker.last_name?.[0] || "";
 
-    if (first || last) {
-      return `${first}${last}`.toUpperCase();
-    }
-
-    return worker.username?.charAt(0).toUpperCase();
+    return (first + last || worker.username[0]).toUpperCase();
   }
-
-  //------------------------------------------------------
-  // Open Chat
-  //------------------------------------------------------
 
   function openChat(worker) {
     setSelectedWorker(worker);
     setShowChat(true);
   }
-
-  //------------------------------------------------------
-  // Loading
-  //------------------------------------------------------
 
   if (loading) {
     return (
@@ -177,69 +175,44 @@ export default function DashboardMessages() {
     );
   }
 
-  //------------------------------------------------------
-  // JSX
-  //------------------------------------------------------
-
   return (
     <>
       <div className="messages-page">
 
-        {/* Header */}
-
         <div className="messages-header">
           <div>
             <h2>Messages</h2>
-
-            <p>
-              Chat with workers you've worked with.
-            </p>
+            <p>Chat with workers you've worked with.</p>
           </div>
 
           <div className="messages-count">
             <Users size={18} />
-
             {workers.length}
           </div>
         </div>
 
-        {/* Search */}
-
         <div className="messages-search">
           <Search size={18} />
-
           <input
-            type="text"
             placeholder="Search workers..."
             value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-
-        {/* Worker List */}
 
         <div className="workers-list">
 
           {filteredWorkers.length === 0 && (
             <div className="workers-empty">
-
-              <MessageCircle size={52} />
-
+              <MessageCircle size={50} />
               <h3>No Workers Found</h3>
-
-              <p>
-                You haven't started a project with any
-                worker yet.
-              </p>
-
+              <p>You haven't worked with any workers yet.</p>
             </div>
           )}
 
           {filteredWorkers.map((worker) => (
             <button
-              key={worker.id}
+              key={worker.userId}
               className="worker-row"
               onClick={() => openChat(worker)}
             >
@@ -258,21 +231,15 @@ export default function DashboardMessages() {
                 )}
 
                 <div className="worker-info">
-
                   <h4>
                     {worker.first_name} {worker.last_name}
                   </h4>
 
-                  <span>
-                    @{worker.username}
-                  </span>
-
+                  <span>@{worker.username}</span>
                 </div>
-
               </div>
 
               <ChevronRight size={18} />
-
             </button>
           ))}
 
