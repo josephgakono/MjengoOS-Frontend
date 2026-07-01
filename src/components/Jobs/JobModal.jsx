@@ -1,169 +1,124 @@
 import { useEffect, useState } from "react";
 import {
   X,
+  User,
   CalendarDays,
   MapPin,
-  User,
-  FileText,
   BadgeDollarSign,
   CheckCircle2,
+  FileText,
   ImageIcon,
 } from "lucide-react";
-
 import { api } from "../../services/api";
+import "../../styles/JobsModal.css";
 
-import "../../styles/JobModal.css";
-
-export default function JobModal({
-  open,
-  jobId,
-  onClose,
-}) {
+export default function JobModal({ open, jobId, onClose }) {
   const [loading, setLoading] = useState(true);
-
   const [job, setJob] = useState(null);
-
   const [budget, setBudget] = useState(null);
-
   const [updates, setUpdates] = useState([]);
-
   const [error, setError] = useState("");
 
-  //------------------------------------------------
-  // Close with ESC
-  //------------------------------------------------
-
   useEffect(() => {
-    function handleKey(e) {
+    const close = (e) => {
       if (e.key === "Escape") onClose();
-    }
-
-    window.addEventListener("keydown", handleKey);
-
-    return () => window.removeEventListener("keydown", handleKey);
+    };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
   }, [onClose]);
-
-  //------------------------------------------------
-  // Load everything
-  //------------------------------------------------
 
   useEffect(() => {
     if (!open || !jobId) return;
 
-    loadJob();
-  }, [open, jobId]);
+    async function load() {
+      try {
+        setLoading(true);
+        setError("");
 
-  //------------------------------------------------
-  // Fetch Data
-  //------------------------------------------------
+        const [jobData, quotationData, progressData] = await Promise.all([
+          api.get(`jobs/${jobId}/`),
+          api.get("quotations/"),
+          api.get("progress-updates/"),
+        ]);
 
-  async function loadJob() {
-    setLoading(true);
+        setJob(jobData);
 
-    setError("");
 
-    try {
-      //-----------------------------------
-      // Job
-      //-----------------------------------
+        const quotations = Array.isArray(quotationData)
+          ? quotationData
+          : quotationData.results || [];
 
-      const jobData = await api.get(`jobs/${jobId}/`);
+        const accepted = quotations.find(
+          (q) =>
+            q.job === jobData.id &&
+            (q.status === "accepted" || q.accepted === true)
+        );
 
-      setJob(jobData);
+        setBudget(accepted ? accepted.amount : null);
 
-      //-----------------------------------
-      // Accepted quotation
-      //-----------------------------------
+        const progress = Array.isArray(progressData)
+          ? progressData
+          : progressData.results || [];
 
-      const quotations = await api.get("quotations/");
+        const filtered = progress
+          .filter((u) => u.job === jobData.id)
+          .sort(
+            (a, b) =>
+              new Date(b.created_at) -
+              new Date(a.created_at)
+          );
 
-      const accepted = quotations.find(
-        (q) =>
-          q.job === jobData.id &&
-          (q.status === "accepted" || q.accepted === true)
-      );
-
-      if (accepted) {
-        setBudget(accepted.amount);
-      } else {
-        setBudget(null);
+        setUpdates(filtered);
+      } catch (err) {
+        console.error(err);
+        setError("Unable to load job.");
+      } finally {
+        setLoading(false);
       }
-
-      //-----------------------------------
-      // Progress updates
-      //-----------------------------------
-
-      const progress = await api.get("progress-updates/");
-
-      const filtered = progress.filter(
-        (item) => item.job === jobData.id
-      );
-
-      filtered.sort(
-        (a, b) =>
-          new Date(b.created_at) -
-          new Date(a.created_at)
-      );
-
-      setUpdates(filtered);
-    } catch (err) {
-      console.error(err);
-
-      setError("Unable to load job.");
-    } finally {
-      setLoading(false);
     }
-  }
 
-  //------------------------------------------------
-  // Helpers
-  //------------------------------------------------
+    load();
+  }, [jobId, open]);
 
   function formatDate(date) {
     if (!date) return "-";
-
-    return new Date(date).toLocaleDateString(undefined, {
+    return new Date(date).toLocaleDateString("en-GB", {
       day: "numeric",
       month: "long",
       year: "numeric",
     });
   }
 
-  function statusClass(status) {
-    if (!status) return "active";
+  function formatTime(date) {
+    if (!date) return "";
+    return new Date(date).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
 
-    const value = status.toLowerCase();
+  function statusClass(status = "") {
+    status = status.toLowerCase();
 
-    if (value.includes("complete")) return "completed";
-
-    if (value.includes("quote")) return "quoted";
+    if (status.includes("complete")) return "completed";
+    if (status.includes("quote")) return "quoted";
 
     return "active";
   }
 
-  //------------------------------------------------
-  // Closed
-  //------------------------------------------------
-
   if (!open) return null;
-
-  //------------------------------------------------
-  // JSX
-  //------------------------------------------------
 
   return (
     <>
-      <div
-        className="job-modal-overlay"
-        onClick={onClose}
-      />
+      <div className="job-modal-overlay" onClick={onClose}></div>
 
       <div className="job-modal">
+
         <button
           className="job-modal-close"
           onClick={onClose}
         >
-          <X size={22} />
+          <X size={20} />
         </button>
 
         {loading ? (
@@ -176,218 +131,195 @@ export default function JobModal({
           </div>
         ) : (
           <>
-            {/*========================================*/}
-            {/* HEADER */}
-            {/*========================================*/}
+                      {/* ================= HEADER ================= */}
 
-            <div className="job-modal-header">
+            <div className="job-header">
               <h2>{job.title}</h2>
-
-              <p>
-                Job #{job.id}
-              </p>
+              <span>Job #{job.id}</span>
             </div>
 
-            {/*========================================*/}
-            {/* DETAILS */}
-            {/*========================================*/}
+            {/* ================= DETAILS ================= */}
 
-            <div className="job-info-grid">
+            <div className="job-details">
 
-              <Info
+              <InfoRow
                 icon={<User size={18} />}
                 label="Worker"
-                value={
-                  job.worker_name ||
-                  job.worker?.username ||
-                  "Not Assigned"
-                }
+                value={job.worker_name || job.worker?.username || "Not Assigned"}
               />
 
-              <Info
+              <InfoRow
                 icon={<CalendarDays size={18} />}
                 label="Due Date"
                 value={formatDate(job.due_date)}
               />
 
-              <Info
+              <InfoRow
                 icon={<CheckCircle2 size={18} />}
                 label="Status"
                 value={
-                  <span
-                    className={`job-status ${statusClass(
-                      job.status
-                    )}`}
-                  >
+                  <span className={`job-status ${statusClass(job.status)}`}>
                     {job.status}
                   </span>
                 }
               />
 
-              <Info
+              <InfoRow
                 icon={<MapPin size={18} />}
                 label="Location"
-                value={
-                  job.location || "-"
-                }
+                value={job.location || "Not Provided"}
               />
 
-              <Info
+              <InfoRow
                 icon={<BadgeDollarSign size={18} />}
                 label="Budget"
                 value={
                   budget
-                    ? `KES ${Number(
-                        budget
-                      ).toLocaleString()}`
+                    ? `KES ${Number(budget).toLocaleString()}`
                     : "No accepted quotation"
                 }
               />
 
             </div>
 
-            {/*========================================*/}
-            {/* DESCRIPTION */}
-            {/*========================================*/}
+            {/* ================= DESCRIPTION ================= */}
 
-            <section className="job-description">
-              <h3>
-                <FileText size={18} />
-                Description
-              </h3>
+            <div className="job-section">
 
-              <p>
-                {job.description ||
-                  "No description provided."}
+              <div className="section-title">
+                <FileText size={18}/>
+                <span>Description</span>
+              </div>
+
+              <p className="job-description">
+                {job.description || "No description provided."}
               </p>
-            </section>
 
-            {/*========================================*/}
-            {/* PROGRESS */}
-            {/*========================================*/}
+            </div>
 
-            <section className="progress-section">
+            {/* ================= PROGRESS ================= */}
 
-              <div className="progress-header">
-                <h3>
-                  Progress Updates
-                </h3>
+            <div className="job-section">
 
-                <span>
-                  {updates.length}
-                </span>
+              <div className="section-header">
+
+                <h3>Progress Updates</h3>
+
+                <span>{updates.length}</span>
+
               </div>
 
               <div className="progress-list">
 
                 {updates.length === 0 && (
+
                   <div className="progress-empty">
-                    No progress updates yet.
+
+                    <ImageIcon size={34}/>
+
+                    <p>No progress updates yet.</p>
+
                   </div>
+
                 )}
 
                 {updates.map((update) => (
+
                   <div
                     key={update.id}
-                    className="progress-card"
+                    className="progress-item"
                   >
-                    <div className="progress-card-header">
+
+                    <div className="progress-top">
 
                       <div>
+
                         <h4>
-                          Update
+                          {job.worker_name ||
+                           job.worker?.username ||
+                           "Worker"}
                         </h4>
 
                         <span>
-                          {formatDate(
-                            update.created_at
-                          )}
+                          {formatDate(update.created_at)}
+                          {" • "}
+                          {formatTime(update.created_at)}
                         </span>
+
                       </div>
 
                     </div>
 
-                    {/* Images */}
-
-                    {update.images &&
-                      update.images.length >
-                        0 && (
-                        <div className="progress-gallery">
-
-                          {update.images.map(
-                            (
-                              image,
-                              index
-                            ) => (
-                              <img
-                                key={index}
-                                src={image.image}
-                                alt=""
-                              />
-                            )
-                          )}
-
-                        </div>
-                      )}
-
-                    {/* Optional single image */}
-
-                    {update.image && (
-                      <div className="progress-gallery">
-
-                        <img
-                          src={update.image}
-                          alt=""
-                        />
-
-                      </div>
-                    )}
-
-                    {!update.image &&
-                      !update.images && (
-                        <div className="progress-no-image">
-
-                          <ImageIcon size={18} />
-
-                          No images uploaded
-
-                        </div>
-                      )}
-
-                    <p>
+                    <p className="progress-description">
                       {update.description}
                     </p>
 
+                    {(update.image ||
+                      (update.images &&
+                       update.images.length > 0)) ? (
+
+                      <div className="progress-gallery">
+
+                        {update.image && (
+                          <img
+                            src={update.image}
+                            alt=""
+                          />
+                        )}
+
+                        {update.images?.map((img,index)=>(
+                          <img
+                            key={index}
+                            src={img.image}
+                            alt=""
+                          />
+                        ))}
+
+                      </div>
+
+                    ) : (
+
+                      <div className="progress-no-image">
+
+                        <ImageIcon size={18}/>
+
+                        <span>No images uploaded</span>
+
+                      </div>
+
+                    )}
+
                   </div>
+
                 ))}
 
               </div>
-            </section>
+
+            </div>
+
           </>
         )}
+
       </div>
+
     </>
   );
 }
 
-function Info({
-  icon,
-  label,
-  value,
-}) {
+function InfoRow({ icon, label, value }) {
   return (
-    <div className="job-info-item">
+    <div className="job-row">
 
-      <div className="job-info-icon">
+      <div className="job-row-icon">
         {icon}
       </div>
 
-      <div>
+      <div className="job-row-label">
+        {label}
+      </div>
 
-        <small>{label}</small>
-
-        <div>{value}</div>
-
+      <div className="job-row-value">
+        {value}
       </div>
 
     </div>
