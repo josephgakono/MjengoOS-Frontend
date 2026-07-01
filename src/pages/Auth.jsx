@@ -106,6 +106,8 @@ function Auth() {
 
   const login = async ({ username, password, user }) => {
     const tokens = await requestData("/api/token/", { username, password });
+
+    // Save what we have immediately (signup may include extra fields)
     saveAuth({
       tokens,
       user: {
@@ -119,6 +121,37 @@ function Auth() {
         profile_picture: user?.profile_picture || "",
       },
     });
+
+    // IMPORTANT:
+    // Update local user id to match backend "me/" response for the logged-in account.
+    // This ensures ChatModal uses the correct id when matching messages.
+    try {
+      const meRes = await fetch(`${API_BASE_URL}/me/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokens.access}`,
+        },
+      });
+
+      if (!meRes.ok) return;
+
+      const me = await meRes.json().catch(() => null);
+
+      if (me?.id) {
+        const existing = JSON.parse(localStorage.getItem("user")) || {};
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            ...existing,
+            id: me.id,
+          }),
+        );
+        window.dispatchEvent(new Event("storage"));
+      }
+    } catch {
+      // Non-fatal: keep existing stored user data even if "me/" fetch fails.
+    }
   };
 
   const handleSubmit = async (event) => {
