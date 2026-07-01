@@ -13,6 +13,7 @@ import "../styles/dashboard.css";
 import QuotationsPage from "../components/customer/quotations/QuotationsPage";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
 import DashboardJobs from "../components/customer/DashboardJobs";
+import DashboardMessages from "../components/customer/DashboardMessages";
 
 function getStoredUser() {
   try {
@@ -149,6 +150,18 @@ export default function CustomerDashboard() {
                 setSidebarOpen={setSidebarOpen}
               />
               <DashboardJobs />
+            </>
+          )}
+
+          {activeTab === "messages" && (
+            <>
+              <DashboardHeader
+                title="Messages"
+                subtitle="Communicate with workers you've collaborated with."
+                setSidebarOpen={setSidebarOpen}
+              />
+
+              <DashboardMessages />
             </>
           )}
         </main>
