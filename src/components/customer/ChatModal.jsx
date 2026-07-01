@@ -50,15 +50,19 @@ export default function ChatModal({ open, worker, onClose }) {
 
       const allMessages = Array.isArray(data) ? data : data.results || [];
 
-      const currentUser = JSON.parse(localStorage.getItem("user"));
+      const currentUser = JSON.parse(localStorage.getItem("user"))
+      const filtered = allMessages.filter((msg) => {
+        return (
+          String(msg.sender) === String(currentUser.id) &&
+          String(msg.receiver) === String(worker.userId)
+        ) ||
+          (
+            String(msg.sender) === String(worker.userId) &&
+            String(msg.receiver) === String(currentUser.id)
+          );
+      });
 
-      const filtered = allMessages.filter(
-        (msg) =>
-          (msg.sender === currentUser.id && msg.receiver === worker.userId) ||
-          (msg.sender === worker.userId && msg.receiver === currentUser.id),
-      );
-
-      filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      filtered.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
       setMessages(filtered);
     } catch (err) {
@@ -181,7 +185,7 @@ export default function ChatModal({ open, worker, onClose }) {
                   {msg.content}
 
                   <span className="message-time">
-                    {new Date(msg.created_at).toLocaleTimeString([], {
+                    {new Date(msg.timestamp).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
