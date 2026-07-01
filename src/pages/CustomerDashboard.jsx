@@ -12,6 +12,7 @@ import PostJobModal from "../components/jobs/PostJobModal";
 import "../styles/dashboard.css";
 import QuotationsPage from "../components/customer/quotations/QuotationsPage";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
+import DashboardJobs from "../components/customer/DashboardJobs";
 
 function getStoredUser() {
   try {
@@ -137,6 +138,17 @@ export default function CustomerDashboard() {
                 setSidebarOpen={setSidebarOpen}
               />
               <Profile />
+            </>
+          )}
+
+          {activeTab === "jobs" && (
+            <>
+              <DashboardHeader
+                title="My Jobs"
+                subtitle="Manage all jobs you've posted."
+                setSidebarOpen={setSidebarOpen}
+              />
+              <DashboardJobs />
             </>
           )}
         </main>
