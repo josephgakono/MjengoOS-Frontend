@@ -193,7 +193,7 @@ export default function DashboardJobs({ onPostJob }) {
   //-------------------------------------------------------
 
   return (
-    <section className="jobs-page">
+    <>
 
       {/*===========================
         Summary Cards
@@ -415,6 +415,6 @@ export default function DashboardJobs({ onPostJob }) {
         </div>
       )}
 
-    </section>
+    </>
   );
 }
