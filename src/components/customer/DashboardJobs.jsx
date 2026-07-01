@@ -8,7 +8,7 @@ import {
   Calendar,
   ChevronRight,
 } from "lucide-react";
-
+import JobModal from "../jobs/JobModal";
 import { api } from "../../services/api";
 import "../../styles/Jobs.css";
 
@@ -20,6 +20,7 @@ export default function DashboardJobs({ onPostJob }) {
   const [loading, setLoading] = useState(true);
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
+  const [showJobModal, setShowJobModal] = useState(false);
 
   //-------------------------------------------------------
   // Load Jobs
@@ -42,7 +43,15 @@ export default function DashboardJobs({ onPostJob }) {
       setLoading(false);
     }
   }
+  function openJob(job) {
+    setSelectedJob(job);
+    setShowJobModal(true);
+  }
 
+  function closeJob() {
+    setShowJobModal(false);
+    setSelectedJob(null);
+  }
   //-------------------------------------------------------
   // Helpers
   //-------------------------------------------------------
@@ -51,10 +60,7 @@ export default function DashboardJobs({ onPostJob }) {
     return jobs.filter((job) => {
       const status = String(job.status || "").toLowerCase();
 
-      return (
-        status === "completed" ||
-        status === "complete"
-      );
+      return status === "completed" || status === "complete";
     });
   }, [jobs]);
 
@@ -62,23 +68,17 @@ export default function DashboardJobs({ onPostJob }) {
     return jobs.filter((job) => {
       const status = String(job.status || "").toLowerCase();
 
-      return (
-        status !== "completed" &&
-        status !== "complete"
-      );
+      return status !== "completed" && status !== "complete";
     });
   }, [jobs]);
 
   const quotedJobs = useMemo(() => {
     return jobs.filter((job) => {
-      if (job.quotation_count)
-        return job.quotation_count > 0;
+      if (job.quotation_count) return job.quotation_count > 0;
 
-      if (job.has_quotation)
-        return true;
+      if (job.has_quotation) return true;
 
-      if (job.quoted)
-        return true;
+      if (job.quoted) return true;
 
       return false;
     });
@@ -91,14 +91,11 @@ export default function DashboardJobs({ onPostJob }) {
   function formatDate(date) {
     if (!date) return "Recently";
 
-    return new Date(date).toLocaleDateString(
-      "en-GB",
-      {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }
-    );
+    return new Date(date).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
   }
 
   //-------------------------------------------------------
@@ -107,71 +104,37 @@ export default function DashboardJobs({ onPostJob }) {
 
   function JobCard({ job, completed }) {
     return (
-      <button
-        className="job-item"
-        onClick={() =>
-          setSelectedJob(job)
-        }
-      >
+      <button className="job-item" onClick={() => openJob(job)}>
+        
         <div className="job-item-top">
-
           <div>
-
-            <h4>
-              {job.title}
-            </h4>
+            <h4>{job.title}</h4>
 
             <div className="job-meta">
-
               <span>
-
                 <MapPin size={14} />
 
-                {job.location ||
-                  "Location not provided"}
-
+                {job.location || "Location not provided"}
               </span>
 
               <span>
-
                 <Calendar size={14} />
 
-                {formatDate(
-                  job.created_at
-                )}
-
+                {formatDate(job.created_at)}
               </span>
-
             </div>
-
           </div>
 
-          <ChevronRight
-            size={18}
-          />
-
+          <ChevronRight size={18} />
         </div>
 
         <div className="job-item-bottom">
-
-          <span
-            className={
-              completed
-                ? "status completed"
-                : "status active"
-            }
-          >
-            {completed
-              ? "Completed"
-              : "Active"}
+          <span className={completed ? "status completed" : "status active"}>
+            {completed ? "Completed" : "Active"}
           </span>
 
-          <span className="view-text">
-            View Details
-          </span>
-
+          <span className="view-text">View Details</span>
         </div>
-
       </button>
     );
   }
@@ -181,11 +144,7 @@ export default function DashboardJobs({ onPostJob }) {
   //-------------------------------------------------------
 
   if (loading) {
-    return (
-      <div className="jobs-loading">
-        Loading jobs...
-      </div>
-    );
+    return <div className="jobs-loading">Loading jobs...</div>;
   }
 
   //-------------------------------------------------------
@@ -194,71 +153,40 @@ export default function DashboardJobs({ onPostJob }) {
 
   return (
     <>
-
       {/*===========================
         Summary Cards
       ============================*/}
 
       <div className="jobs-summary">
-
         <div className="summary-card blue">
-
           <div>
+            <span>Active Jobs</span>
 
-            <span>
-              Active Jobs
-            </span>
-
-            <h2>
-              {activeJobs.length}
-            </h2>
-
+            <h2>{activeJobs.length}</h2>
           </div>
 
           <Briefcase size={34} />
-
         </div>
 
         <div className="summary-card purple">
-
           <div>
+            <span>Completed Jobs</span>
 
-            <span>
-              Completed Jobs
-            </span>
-
-            <h2>
-              {completedJobs.length}
-            </h2>
-
+            <h2>{completedJobs.length}</h2>
           </div>
 
-          <CheckCircle2
-            size={34}
-          />
-
+          <CheckCircle2 size={34} />
         </div>
 
         <div className="summary-card orange">
-
           <div>
+            <span>Quoted Jobs</span>
 
-            <span>
-              Quoted Jobs
-            </span>
-
-            <h2>
-              {quotedJobs.length}
-            </h2>
-
+            <h2>{quotedJobs.length}</h2>
           </div>
 
-          <ClipboardList
-            size={34}
-          />
-
+          <ClipboardList size={34} />
         </div>
-
       </div>
 
       {/*===========================
@@ -266,87 +194,42 @@ export default function DashboardJobs({ onPostJob }) {
       ============================*/}
 
       <div className="jobs-container">
-
         <div className="jobs-header">
-
           <div>
+            <h2>My Jobs</h2>
 
-            <h2>
-              My Jobs
-            </h2>
-
-            <p>
-              Manage every
-              construction job you've
-              posted.
-            </p>
-
+            <p>Manage every construction job you've posted.</p>
           </div>
 
-          <button
-            className="post-job-btn"
-            onClick={onPostJob}
-          >
-
+          <button className="post-job-btn" onClick={onPostJob}>
             <Plus size={18} />
-
             Post New Job
-
           </button>
-
         </div>
 
         <div className="jobs-columns">
-
           {/*===========================
             Active Jobs
           ============================*/}
 
           <div className="jobs-column">
-
             <div className="column-header">
+              <h3>Active Jobs</h3>
 
-              <h3>
-                Active Jobs
-              </h3>
-
-              <span>
-                {
-                  activeJobs.length
-                }
-              </span>
-
+              <span>{activeJobs.length}</span>
             </div>
 
             <div className="jobs-scroll">
-
-              {activeJobs.length >
-              0 ? (
-                activeJobs.map(
-                  (job) => (
-                    <JobCard
-                      key={job.id}
-                      job={job}
-                    />
-                  )
-                )
+              {activeJobs.length > 0 ? (
+                activeJobs.map((job) => <JobCard key={job.id} job={job} />)
               ) : (
                 <div className="empty-state">
+                  <Briefcase size={44} />
 
-                  <Briefcase
-                    size={44}
-                  />
-
-                  <p>
-                    No active jobs
-                    found.
-                  </p>
-
+                  <p>No active jobs found.</p>
                 </div>
               )}
-
             </div>
-
           </div>
 
           {/*===========================
@@ -354,67 +237,39 @@ export default function DashboardJobs({ onPostJob }) {
           ============================*/}
 
           <div className="jobs-column">
-
             <div className="column-header">
+              <h3>Completed Jobs</h3>
 
-              <h3>
-                Completed Jobs
-              </h3>
-
-              <span>
-                {
-                  completedJobs.length
-                }
-              </span>
-
+              <span>{completedJobs.length}</span>
             </div>
 
             <div className="jobs-scroll">
-
-              {completedJobs.length >
-              0 ? (
-                completedJobs.map(
-                  (job) => (
-                    <JobCard
-                      key={job.id}
-                      job={job}
-                      completed
-                    />
-                  )
-                )
+              {completedJobs.length > 0 ? (
+                completedJobs.map((job) => (
+                  <JobCard key={job.id} job={job} completed />
+                ))
               ) : (
                 <div className="empty-state">
+                  <CheckCircle2 size={44} />
 
-                  <CheckCircle2
-                    size={44}
-                  />
-
-                  <p>
-                    No completed
-                    jobs yet.
-                  </p>
-
+                  <p>No completed jobs yet.</p>
                 </div>
               )}
-
             </div>
-
           </div>
-
         </div>
-
       </div>
 
       {/*====================================
       Future Modal Hook
       ====================================*/}
+      <JobModal
+    open={showJobModal}
+    jobId={selectedJob?.id}
+    onClose={closeJob}
+/>
 
-      {selectedJob && (
-        <div style={{ display: "none" }}>
-          {selectedJob.id}
-        </div>
-      )}
-
+      
     </>
   );
 }
