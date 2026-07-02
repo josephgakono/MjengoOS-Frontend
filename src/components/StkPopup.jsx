@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { X, Smartphone } from "lucide-react";
-import { api } from "../../services/api";
+import { api } from "../services/api";
 
 export default function StkPopup({
   open,

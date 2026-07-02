@@ -31,9 +31,18 @@ export default function QuotationModal({
 
   const [showStkPopup, setShowStkPopup] = useState(false);
 
-  if (!isOpen || !quotation) return null;
+  //----------------------------------------------------
+  // Load Project + Payment Status
+  //----------------------------------------------------
 
-  const {
+  useEffect(() => {
+    if (!quotation) return;
+
+    loadProject();
+  }, [quotation]);
+ 
+ if (!isOpen || !quotation) return null;
+ const {
     id,
     amount,
     estimated_days,
@@ -44,15 +53,6 @@ export default function QuotationModal({
     job,
   } = quotation;
 
-  //----------------------------------------------------
-  // Load Project + Payment Status
-  //----------------------------------------------------
-
-  useEffect(() => {
-    if (!quotation) return;
-
-    loadProject();
-  }, [quotation]);
 
   async function loadProject() {
     try {
@@ -194,7 +194,7 @@ export default function QuotationModal({
   return (
     <>
       <div className="quote-modal-overlay" onClick={onClose}>
-        <div className="quote-modal" onClick={(e) => e.stopPropagation()}></div>
+        <div className="quote-modal" onClick={(e) => e.stopPropagation()}>
         {/* ================= HEADER ================= */}
 
         <div className="quote-modal-header">
@@ -482,6 +482,7 @@ export default function QuotationModal({
             onUpdated?.();
           }}
         />
+      </div>
       </div>
     </>
   );
