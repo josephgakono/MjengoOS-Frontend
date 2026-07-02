@@ -14,6 +14,7 @@ import QuotationsPage from "../components/customer/quotations/QuotationsPage";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
 import DashboardJobs from "../components/customer/DashboardJobs";
 import DashboardMessages from "../components/customer/DashboardMessages";
+import CustomerProjects from "../components/customer/CustomerProjects";
 
 function getStoredUser() {
   try {
@@ -139,6 +140,16 @@ export default function CustomerDashboard() {
                 setSidebarOpen={setSidebarOpen}
               />
               <Profile />
+            </>
+          )}
+          {activeTab === "projects" && (
+            <>
+              <DashboardHeader
+                title="My Projects"
+                subtitle="View and manage your created projects."
+                setSidebarOpen={setSidebarOpen}
+              />
+              <CustomerProjects/>
             </>
           )}
 
