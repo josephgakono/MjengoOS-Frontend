@@ -8,15 +8,13 @@ import {
 } from "lucide-react";
 
 import { api } from "../../../services/api";
-
 import ProjectModal from "./ProjectModal";
 
 import "../../../styles/WorkerProjects.css";
 
 export default function WorkerProjects() {
-  const [loading, setLoading] = useState(true);
-
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
 
@@ -33,22 +31,18 @@ export default function WorkerProjects() {
   }, []);
 
   async function loadProjects() {
-    setLoading(true);
-
     try {
-      //-----------------------------------------
-      // Logged in worker profile
-      //-----------------------------------------
+      setLoading(true);
 
-      const workerProfileResponse = await api.get("workerprofile/");
+      // Current worker profile
 
-      const workerProfile = Array.isArray(workerProfileResponse)
-        ? workerProfileResponse[0]
-        : workerProfileResponse;
+      const workerResponse = await api.get("workerprofile/");
 
-      //-----------------------------------------
-      // Projects
-      //-----------------------------------------
+      const worker = Array.isArray(workerResponse)
+        ? workerResponse[0]
+        : workerResponse;
+
+      // All projects
 
       const projectsResponse = await api.get("projects/");
 
@@ -56,45 +50,35 @@ export default function WorkerProjects() {
         ? projectsResponse
         : projectsResponse.results || [];
 
-      //-----------------------------------------
-      // My projects only
-      //-----------------------------------------
+      // Only mine
 
       const myProjects = allProjects.filter(
-        (project) => Number(project.worker) === Number(workerProfile.id),
+        (project) => Number(project.worker) === Number(worker.id),
       );
 
-      //-----------------------------------------
-      // Attach Job information
-      //-----------------------------------------
+      // Attach job information
 
-      const projectsWithJobs = await Promise.all(
+      const data = await Promise.all(
         myProjects.map(async (project) => {
           try {
             const job = await api.get(`jobs/${project.job}/`);
 
             return {
               ...project,
-              jobData: job,
+              job,
             };
           } catch {
             return {
               ...project,
-              jobData: null,
+              job: null,
             };
           }
         }),
       );
 
-      //-----------------------------------------
-      // Sort newest first
-      //-----------------------------------------
+      data.sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
 
-      projectsWithJobs.sort(
-        (a, b) => new Date(b.start_date) - new Date(a.start_date),
-      );
-
-      setProjects(projectsWithJobs);
+      setProjects(data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -107,31 +91,16 @@ export default function WorkerProjects() {
   //--------------------------------------------------
 
   const stats = useMemo(() => {
-    const active = projects.filter((p) => p.status !== "completed").length;
-
-    const completed = projects.filter((p) => p.status === "completed").length;
-
-    const escrowReady = projects.filter(
-      (p) => p.payment_received && p.status !== "completed",
-    ).length;
-
-    const dueSoon = projects.filter((p) => {
-      if (p.status === "completed") return false;
-
-      const today = new Date();
-
-      const due = new Date(p.expected_completion);
-
-      const diff = (due - today) / (1000 * 60 * 60 * 24);
-
-      return diff <= 3;
-    }).length;
-
     return {
-      active,
-      completed,
-      escrowReady,
-      dueSoon,
+      total: projects.length,
+
+      active: projects.filter((p) => p.status !== "completed").length,
+
+      completed: projects.filter((p) => p.status === "completed").length,
+
+      escrow: projects.filter(
+        (p) => p.payment_received && p.status !== "completed",
+      ).length,
     };
   }, [projects]);
 
@@ -145,22 +114,16 @@ export default function WorkerProjects() {
     const value = search.toLowerCase();
 
     return projects.filter((project) => {
-      const title = project.jobData?.title?.toLowerCase() || "";
+      const title = project.job?.title?.toLowerCase() || "";
 
-      const description = project.jobData?.description?.toLowerCase() || "";
+      const location = project.job?.location?.toLowerCase() || "";
 
-      const location = project.jobData?.location?.toLowerCase() || "";
-
-      return (
-        title.includes(value) ||
-        description.includes(value) ||
-        location.includes(value)
-      );
+      return title.includes(value) || location.includes(value);
     });
   }, [projects, search]);
 
   //--------------------------------------------------
-  // Separate Lists
+  // Lists
   //--------------------------------------------------
 
   const activeProjects = filteredProjects.filter(
@@ -175,94 +138,54 @@ export default function WorkerProjects() {
   // Helpers
   //--------------------------------------------------
 
-  function formatDate(date) {
-    if (!date) return "--";
-
-    return new Date(date).toLocaleDateString(undefined, {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  }
+  const formatDate = (date) =>
+    date ? new Date(date).toLocaleDateString() : "--";
 
   function openProject(project) {
     setSelectedProject(project);
     setShowModal(true);
   }
-  //--------------------------------------------------
-  // Loading State
-  //--------------------------------------------------
 
   if (loading) {
     return <div className="worker-projects-loading">Loading projects...</div>;
   }
-
-  //--------------------------------------------------
-  // JSX
-  //--------------------------------------------------
-
   return (
     <>
       <div className="worker-projects-page">
-        {/* Header */}
-
-        <div className="worker-projects-header">
-          <div>
-            <h2>My Projects</h2>
-
-            <p>
-              Manage assigned projects, track progress updates and complete
-              work.
-            </p>
-          </div>
-        </div>
-
         {/* Stats */}
 
-        <div className="worker-projects-stats">
-          <div className="project-stat-card">
-            <div className="project-stat-icon">
-              <BriefcaseBusiness size={22} />
-            </div>
+        <div className="worker-project-stats">
+          {[
+            {
+              title: "Total Projects",
+              value: stats.total,
+              icon: <BriefcaseBusiness size={20} />,
+            },
+            {
+              title: "Active",
+              value: stats.active,
+              icon: <Clock3 size={20} />,
+            },
+            {
+              title: "Completed",
+              value: stats.completed,
+              icon: <CheckCircle2 size={20} />,
+            },
+            {
+              title: "Escrow Holding",
+              value: stats.escrow,
+              icon: <Wallet size={20} />,
+            },
+          ].map((card) => (
+            <div className="worker-project-stat-card" key={card.title}>
+              <div className="icon">{card.icon}</div>
 
-            <div>
-              <h3>{stats.active}</h3>
-              <span>Active Projects</span>
+              <div>
+                <h4>{card.title}</h4>
+                <strong>{card.value}</strong>
+              </div>
             </div>
-          </div>
-
-          <div className="project-stat-card">
-            <div className="project-stat-icon completed">
-              <CheckCircle2 size={22} />
-            </div>
-
-            <div>
-              <h3>{stats.completed}</h3>
-              <span>Completed</span>
-            </div>
-          </div>
-
-          <div className="project-stat-card">
-            <div className="project-stat-icon due">
-              <Clock3 size={22} />
-            </div>
-
-            <div>
-              <h3>{stats.dueSoon}</h3>
-              <span>Due Soon</span>
-            </div>
-          </div>
-
-          <div className="project-stat-card">
-            <div className="project-stat-icon escrow">
-              <Wallet size={22} />
-            </div>
-
-            <div>
-              <h3>{stats.escrowReady}</h3>
-              <span>Escrow Ready</span>
-            </div>
-          </div>
+          ))}
         </div>
 
         {/* Search */}
@@ -271,149 +194,82 @@ export default function WorkerProjects() {
           <Search size={18} />
 
           <input
-            type="text"
             placeholder="Search projects..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        {/* Active Projects */}
+        {/* Lists */}
 
-        <section className="projects-section">
-          <div className="projects-section-header">
-            <h3>Active Projects</h3>
+        <div className="worker-project-columns">
+          {/* Active */}
 
-            <span>{activeProjects.length}</span>
-          </div>
+          <div className="project-column">
+            <h3>Active Projects ({activeProjects.length})</h3>
 
-          {activeProjects.length === 0 ? (
-            <div className="projects-empty">
-              <h4>No Active Projects</h4>
+            {activeProjects.length === 0 ? (
+              <div className="project-empty">No active projects.</div>
+            ) : (
+              activeProjects.map((project) => (
+                <div
+                  key={project.id}
+                  className="project-card"
+                  onClick={() => openProject(project)}
+                >
+                  <div className="project-card-header">
+                    <h4>{project.job?.title || "Untitled Job"}</h4>
 
-              <p>Assigned projects will appear here.</p>
-            </div>
-          ) : (
-            <div className="projects-grid">
-              {activeProjects.map((project) => (
-                <div className="project-card" key={project.id}>
-                  <div className="project-card-top">
-                    <div>
-                      <h4>
-                        {project.jobData?.title || `Project #${project.id}`}
-                      </h4>
-
-                      <span>{project.jobData?.location || "No location"}</span>
-                    </div>
-
-                    <div className="status-badge active">In Progress</div>
+                    <span className="status active">Active</span>
                   </div>
 
-                  <div className="project-card-body">
-                    <div className="project-row">
-                      <span>Start Date</span>
+                  <p>{project.job?.location}</p>
 
-                      <strong>{formatDate(project.start_date)}</strong>
-                    </div>
+                  <div className="project-meta">
+                    <span>Started: {formatDate(project.start_date)}</span>
 
-                    <div className="project-row">
-                      <span>Expected Completion</span>
-
-                      <strong>{formatDate(project.expected_completion)}</strong>
-                    </div>
-
-                    <div className="project-row">
-                      <span>Budget</span>
-
-                      <strong>KES {project.jobData?.budget || "0"}</strong>
-                    </div>
-                  </div>
-
-                  <div className="project-card-footer">
-                    {project.payment_received && (
-                      <div className="escrow-badge">Escrow Secured</div>
-                    )}
-
-                    <button
-                      className="project-view-btn"
-                      onClick={() => openProject(project)}
-                    >
-                      View Project
-                    </button>
+                    <span>Due: {formatDate(project.expected_completion)}</span>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* Completed Projects */}
-
-        <section className="projects-section">
-          <div className="projects-section-header">
-            <h3>Completed Projects</h3>
-
-            <span>{completedProjects.length}</span>
+              ))
+            )}
           </div>
 
-          {completedProjects.length === 0 ? (
-            <div className="projects-empty">
-              <h4>No Completed Projects</h4>
+          {/* Completed */}
 
-              <p>Completed projects will appear here.</p>
-            </div>
-          ) : (
-            <div className="projects-grid">
-              {completedProjects.map((project) => (
-                <div className="project-card completed" key={project.id}>
-                  <div className="project-card-top">
-                    <div>
-                      <h4>
-                        {project.jobData?.title || `Project #${project.id}`}
-                      </h4>
+          <div className="project-column">
+            <h3>Completed Projects ({completedProjects.length})</h3>
 
-                      <span>{project.jobData?.location || "No location"}</span>
-                    </div>
+            {completedProjects.length === 0 ? (
+              <div className="project-empty">No completed projects.</div>
+            ) : (
+              completedProjects.map((project) => (
+                <div
+                  key={project.id}
+                  className="project-card completed"
+                  onClick={() => openProject(project)}
+                >
+                  <div className="project-card-header">
+                    <h4>{project.job?.title || "Untitled Job"}</h4>
 
-                    <div className="status-badge completed">Completed</div>
+                    <span className="status completed">Completed</span>
                   </div>
 
-                  <div className="project-card-body">
-                    <div className="project-row">
-                      <span>Started</span>
+                  <p>{project.job?.location}</p>
 
-                      <strong>{formatDate(project.start_date)}</strong>
-                    </div>
+                  <div className="project-meta">
+                    <span>Started: {formatDate(project.start_date)}</span>
 
-                    <div className="project-row">
-                      <span>Completed</span>
-
-                      <strong>{formatDate(project.actual_completion)}</strong>
-                    </div>
-
-                    <div className="project-row">
-                      <span>Budget</span>
-
-                      <strong>KES {project.jobData?.budget || "0"}</strong>
-                    </div>
-                  </div>
-
-                  <div className="project-card-footer">
-                    <button
-                      className="project-view-btn"
-                      onClick={() => openProject(project)}
-                    >
-                      View Project
-                    </button>
+                    <span>
+                      Finished: {formatDate(project.actual_completion)}
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </section>
+              ))
+            )}
+          </div>
+        </div>
       </div>
-
-      {/* Project Modal */}
 
       <ProjectModal
         open={showModal}
@@ -421,8 +277,6 @@ export default function WorkerProjects() {
         onClose={() => {
           setShowModal(false);
           setSelectedProject(null);
-
-          // refresh after updates or completion
           loadProjects();
         }}
       />
