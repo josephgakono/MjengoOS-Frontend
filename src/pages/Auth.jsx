@@ -105,52 +105,61 @@ function Auth() {
   };
 
   const login = async ({ username, password, user }) => {
-    const tokens = await requestData("/api/token/", { username, password });
+    //----------------------------------------------------
+    // Get JWT Tokens
+    //----------------------------------------------------
 
-    // Save what we have immediately (signup may include extra fields)
-    saveAuth({
-      tokens,
-      user: {
-        id: user?.id,
-        username,
-        first_name: user?.first_name || form.first_name,
-        last_name: user?.last_name || form.last_name,
-        email: user?.email || form.email,
-        phone: user?.phone || form.phone,
-        user_type: user?.user_type || form.user_type,
-        profile_picture: user?.profile_picture || "",
+    const tokens = await requestData("/api/token/", {
+      username,
+      password,
+    });
+
+    //----------------------------------------------------
+    // Get Logged-in User
+    //----------------------------------------------------
+
+    const meRes = await fetch(`${API_BASE_URL}/me/`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${tokens.access}`,
       },
     });
 
-    // IMPORTANT:
-    // Update local user id to match backend "me/" response for the logged-in account.
-    // This ensures ChatModal uses the correct id when matching messages.
-    try {
-      const meRes = await fetch(`${API_BASE_URL}/me/`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokens.access}`,
-        },
-      });
+    if (!meRes.ok) {
+      throw new Error("Unable to load your account.");
+    }
 
-      if (!meRes.ok) return;
+    const me = await meRes.json();
 
-      const me = await meRes.json().catch(() => null);
+    //----------------------------------------------------
+    // Save EVERYTHING from /me/
+    //----------------------------------------------------
 
-      if (me?.id) {
-        const existing = JSON.parse(localStorage.getItem("user")) || {};
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            ...existing,
-            id: me.id,
-          }),
-        );
-        window.dispatchEvent(new Event("storage"));
-      }
-    } catch {
-      // Non-fatal: keep existing stored user data even if "me/" fetch fails.
+    saveAuth({
+      tokens,
+      user: me,
+    });
+
+    //----------------------------------------------------
+    // Redirect based on account type
+    //----------------------------------------------------
+
+    switch (me.user_type) {
+      case "worker":
+        navigate("/worker-dashboard");
+        break;
+
+      case "customer":
+        navigate("/dashboard");
+        break;
+
+      case "contractor":
+        navigate("/contractor-dashboard");
+        break;
+
+      default:
+        navigate("/dashboard");
+        break;
     }
   };
 
@@ -195,7 +204,6 @@ function Auth() {
         });
       }
 
-      navigate("/dashboard");
     } catch (error) {
       setStatus({
         type: "error",
