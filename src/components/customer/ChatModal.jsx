@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { X, Send } from "lucide-react";
 import { api } from "../../services/api";
 
-export default function ChatModal({ open, worker, onClose }) {
+export default function ChatModal({ open, participant, onClose }) {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+
   const messagesEndRef = useRef(null);
 
   //---------------------------------------------------
@@ -37,10 +38,10 @@ export default function ChatModal({ open, worker, onClose }) {
   //---------------------------------------------------
 
   useEffect(() => {
-    if (!open || !worker) return;
+    if (!open || !participant) return;
 
     loadMessages();
-  }, [open, worker]);
+  }, [open, participant]);
 
   async function loadMessages() {
     try {
@@ -48,21 +49,32 @@ export default function ChatModal({ open, worker, onClose }) {
 
       const data = await api.get("messages/");
 
-      const allMessages = Array.isArray(data) ? data : data.results || [];
+      const allMessages = Array.isArray(data)
+        ? data
+        : data.results || [];
 
-      const currentUser = JSON.parse(localStorage.getItem("user"))
+      const currentUser = JSON.parse(
+        localStorage.getItem("user")
+      );
+
       const filtered = allMessages.filter((msg) => {
         return (
-          String(msg.sender) === String(currentUser.id) &&
-          String(msg.receiver) === String(worker.userId)
-        ) ||
-          (
-            String(msg.sender) === String(worker.userId) &&
-            String(msg.receiver) === String(currentUser.id)
-          );
+          (String(msg.sender) === String(currentUser.id) &&
+            String(msg.receiver) ===
+              String(participant.userId)) ||
+
+          (String(msg.sender) ===
+            String(participant.userId) &&
+            String(msg.receiver) ===
+              String(currentUser.id))
+        );
       });
 
-      filtered.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      filtered.sort(
+        (a, b) =>
+          new Date(a.timestamp) -
+          new Date(b.timestamp)
+      );
 
       setMessages(filtered);
     } catch (err) {
@@ -80,11 +92,13 @@ export default function ChatModal({ open, worker, onClose }) {
     if (!message.trim()) return;
 
     try {
-      const currentUser = JSON.parse(localStorage.getItem("user"));
+      const currentUser = JSON.parse(
+        localStorage.getItem("user")
+      );
 
       const payload = {
         sender: currentUser.id,
-        receiver: worker.userId,
+        receiver: participant.userId,
         content: message.trim(),
       };
 
@@ -92,7 +106,7 @@ export default function ChatModal({ open, worker, onClose }) {
 
       setMessage("");
 
-      loadMessages();
+      await loadMessages();
     } catch (err) {
       console.error(err);
     }
@@ -113,13 +127,15 @@ export default function ChatModal({ open, worker, onClose }) {
   // Closed
   //---------------------------------------------------
 
-  if (!open || !worker) return null;
+  if (!open || !participant) return null;
 
   //---------------------------------------------------
   // Avatar
   //---------------------------------------------------
 
-  const initials = `${worker.first_name?.[0] || ""}${worker.last_name?.[0] || ""}`;
+  const initials = `${
+    participant.first_name?.[0] || ""
+  }${participant.last_name?.[0] || ""}`;
 
   //---------------------------------------------------
   // JSX
@@ -127,35 +143,45 @@ export default function ChatModal({ open, worker, onClose }) {
 
   return (
     <>
-      <div className="chat-overlay" onClick={onClose} />
+      <div
+        className="chat-overlay"
+        onClick={onClose}
+      />
 
       <div className="chat-modal">
         {/* Header */}
 
         <div className="chat-header">
           <div className="chat-user">
-            {worker.profile_picture ? (
+            {participant.profile_picture ? (
               <img
-                src={worker.profile_picture}
+                src={participant.profile_picture}
                 alt=""
                 className="chat-avatar"
               />
             ) : (
               <div className="chat-avatar initials">
-                {initials || worker.username[0]}
+                {initials ||
+                  participant.username[0]}
               </div>
             )}
 
             <div>
               <h3>
-                {worker.first_name} {worker.last_name}
+                {participant.first_name}{" "}
+                {participant.last_name}
               </h3>
 
-              <span>@{worker.username}</span>
+              <span>
+                @{participant.username}
+              </span>
             </div>
           </div>
 
-          <button className="chat-close" onClick={onClose}>
+          <button
+            className="chat-close"
+            onClick={onClose}
+          >
             <X size={22} />
           </button>
         </div>
@@ -164,19 +190,27 @@ export default function ChatModal({ open, worker, onClose }) {
 
         <div className="chat-body">
           {loading ? (
-            <div className="chat-loading">Loading conversation...</div>
+            <div className="chat-loading">
+              Loading conversation...
+            </div>
           ) : messages.length === 0 ? (
             <div className="chat-empty">
               <h3>No Messages Yet</h3>
 
-              <p>Start the conversation with {worker.first_name}.</p>
+              <p>
+                Start the conversation with{" "}
+                {participant.first_name}.
+              </p>
             </div>
           ) : (
             messages.map((msg) => (
               <div
                 key={msg.id}
                 className={`message ${
-                  msg.sender === JSON.parse(localStorage.getItem("user")).id
+                  msg.sender ===
+                  JSON.parse(
+                    localStorage.getItem("user")
+                  ).id
                     ? "sent"
                     : "received"
                 }`}
@@ -185,7 +219,9 @@ export default function ChatModal({ open, worker, onClose }) {
                   {msg.content}
 
                   <span className="message-time">
-                    {new Date(msg.timestamp).toLocaleTimeString([], {
+                    {new Date(
+                      msg.timestamp
+                    ).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
@@ -204,7 +240,9 @@ export default function ChatModal({ open, worker, onClose }) {
           <textarea
             placeholder="Type a message..."
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) =>
+              setMessage(e.target.value)
+            }
             onKeyDown={handleKeyDown}
           />
 

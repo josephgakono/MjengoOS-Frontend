@@ -7,6 +7,7 @@ import CustomerDashboard from './pages/CustomerDashboard'
 import QuotationsPage from "./components/customer/quotations/QuotationsPage";
 import Jobs from './pages/Jobs'
 import Contact from './pages/Contact'
+import WorkerDashboard from './pages/WorkerDashboard'
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
         <Route path="/find-jobs" element={<Jobs/>}/>
         <Route path="/contact" element={<Contact/>}/>
         <Route path="/dashboard" element={<CustomerDashboard />} />
-        <Route path="/customer/quotations" element={<QuotationsPage />}/>
+        <Route path="/worker-dashboard" element={<WorkerDashboard />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>

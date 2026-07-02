@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import Sidebar from "../components/dashboard/Sidebar";
+import Profile from "../components/worker/Profile";
+import DashboardMessages from "../components/customer/DashboardMessages";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
 import "../styles/dashboard.css";
 
@@ -147,7 +149,7 @@ export default function WorkerDashboard() {
               setSidebarOpen={setSidebarOpen}
             />
 
-            <WorkerMessages />
+            <DashboardMessages />
           </>
         )}
 
@@ -161,7 +163,7 @@ export default function WorkerDashboard() {
               setSidebarOpen={setSidebarOpen}
             />
 
-            <WorkerProfile />
+            <Profile />
           </>
         )} 
 

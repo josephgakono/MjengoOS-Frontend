@@ -1,10 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  Search,
-  ChevronRight,
-  Users,
-  MessageCircle,
-} from "lucide-react";
+import { Search, ChevronRight, Users, MessageCircle } from "lucide-react";
 
 import { api } from "../../services/api";
 import ChatModal from "./ChatModal";
@@ -13,125 +8,205 @@ import "../../styles/Messages.css";
 
 export default function DashboardMessages() {
   const [loading, setLoading] = useState(true);
-  const [workers, setWorkers] = useState([]);
+  const [participants, setParticipants] = useState([]);
   const [search, setSearch] = useState("");
-  const [selectedWorker, setSelectedWorker] = useState(null);
+  const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [showChat, setShowChat] = useState(false);
 
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const isCustomer = currentUser?.user_type === "customer";
+
   useEffect(() => {
-    loadWorkers();
+    loadParticipants();
   }, []);
 
-  async function loadWorkers() {
+  async function loadParticipants() {
     setLoading(true);
 
     try {
-      const [jobs, projects, quotations, usersResponse] =
-        await Promise.all([
+      //---------------------------------------
+      // CUSTOMER DASHBOARD
+      //---------------------------------------
+
+      if (isCustomer) {
+        const [jobs, projects, quotations, usersResponse] = await Promise.all([
           api.get("jobs/"),
           api.get("projects/"),
           api.get("quotations/"),
           api.get("users/"),
         ]);
 
-      const users = Array.isArray(usersResponse)
-        ? usersResponse
-        : usersResponse.results || [];
+        const users = Array.isArray(usersResponse)
+          ? usersResponse
+          : usersResponse.results || [];
 
-      //---------------------------------------
-      // Collect WorkerProfile IDs
-      //---------------------------------------
+        const workerProfileIds = new Set();
 
-      const workerProfileIds = new Set();
+        const collect = (value) => {
+          if (!value) return;
 
-      const collect = (value) => {
-        if (!value) return;
-
-        if (typeof value === "number") {
-          workerProfileIds.add(value);
-        } else if (value.id) {
-          workerProfileIds.add(value.id);
-        }
-      };
-
-      (jobs || []).forEach((job) => {
-        collect(job.worker);
-        collect(job.assigned_worker);
-      });
-
-      (projects || []).forEach((project) => {
-        collect(project.worker);
-        collect(project.contractor);
-      });
-
-      (quotations || []).forEach((quotation) => {
-        collect(quotation.worker);
-      });
-
-      //---------------------------------------
-      // Load Worker Profiles
-      //---------------------------------------
-
-      const profiles = await Promise.all(
-        [...workerProfileIds].map(async (id) => {
-          try {
-            return await api.get(`workerprofile/${id}/`);
-          } catch {
-            return null;
+          if (typeof value === "number") {
+            workerProfileIds.add(value);
+          } else if (value.id) {
+            workerProfileIds.add(value.id);
           }
-        })
-      );
+        };
+
+        (jobs || []).forEach((job) => {
+          collect(job.worker);
+          collect(job.assigned_worker);
+        });
+
+        (projects || []).forEach((project) => {
+          collect(project.worker);
+          collect(project.contractor);
+        });
+
+        (quotations || []).forEach((quotation) => {
+          collect(quotation.worker);
+        });
+
+        const profiles = await Promise.all(
+          [...workerProfileIds].map(async (id) => {
+            try {
+              return await api.get(`workerprofile/${id}/`);
+            } catch {
+              return null;
+            }
+          }),
+        );
+
+        const mapped = profiles
+          .filter(Boolean)
+          .map((profile) => {
+            const user = users.find((u) => u.id === profile.user);
+
+            if (!user) return null;
+
+            return {
+              userId: user.id,
+              username: user.username,
+              first_name: user.first_name,
+              last_name: user.last_name,
+              profile_picture: user.profile_picture || "",
+              profession: profile.profession,
+            };
+          })
+          .filter(Boolean);
+
+        const unique = [];
+        const seen = new Set();
+
+        mapped.forEach((person) => {
+          if (!seen.has(person.userId)) {
+            seen.add(person.userId);
+            unique.push(person);
+          }
+        });
+
+        unique.sort((a, b) => a.username.localeCompare(b.username));
+
+        setParticipants(unique);
+      }
 
       //---------------------------------------
-      // Match WorkerProfile -> User
+      // WORKER DASHBOARD
       //---------------------------------------
+      else {
+        // Logged in worker profile
+        const workerProfileResponse = await api.get("workerprofile/");
 
-      const mappedWorkers = profiles
-        .filter(Boolean)
-        .map((profile) => {
-          const user = users.find(
-            (u) => u.id === profile.user
-          );
+        const workerProfile = Array.isArray(workerProfileResponse)
+          ? workerProfileResponse[0]
+          : workerProfileResponse;
 
-          if (!user) return null;
+        //---------------------------------------
+        // Load quotations + jobs
+        //---------------------------------------
 
-          return {
-            id: profile.id,                 // WorkerProfile ID
-            userId: user.id,                // User ID (used for messages)
+        const [quotationResponse, jobsResponse] = await Promise.all([
+          api.get("quotations/"),
+          api.get("jobs/"),
+        ]);
 
-            username: user.username,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
+        const quotations = Array.isArray(quotationResponse)
+          ? quotationResponse
+          : quotationResponse.results || [];
 
-            profile_picture:
-              user.profile_picture || "",
+        const jobs = Array.isArray(jobsResponse)
+          ? jobsResponse
+          : jobsResponse.results || [];
 
-            profession: profile.profession,
-          };
-        })
-        .filter(Boolean);
+        //---------------------------------------
+        // My quotations
+        //---------------------------------------
 
-      //---------------------------------------
-      // Remove duplicates by User ID
-      //---------------------------------------
+        const myQuotations = quotations.filter(
+          (q) => Number(q.worker) === Number(workerProfile.id),
+        );
 
-      const uniqueWorkers = [];
+        //---------------------------------------
+        // Job IDs
+        //---------------------------------------
 
-      const seen = new Set();
+        const jobIds = myQuotations.map((q) => q.job);
 
-      mappedWorkers.forEach((worker) => {
-        if (!seen.has(worker.userId)) {
-          seen.add(worker.userId);
-          uniqueWorkers.push(worker);
-        }
-      });
+        //---------------------------------------
+        // Customer USER IDs
+        //---------------------------------------
 
-      uniqueWorkers.sort((a, b) =>
-        a.username.localeCompare(b.username)
-      );
+        const customerUserIds = [
+          ...new Set(
+            jobs
+              .filter((job) => jobIds.includes(job.id))
+              .map((job) => job.customer),
+          ),
+        ];
 
-      setWorkers(uniqueWorkers);
+        //---------------------------------------
+        // Load Users
+        //---------------------------------------
+
+        const customers = await Promise.all(
+          customerUserIds.map(async (id) => {
+            try {
+              return await api.get(`users/${id}/`);
+            } catch {
+              return null;
+            }
+          }),
+        );
+
+        //---------------------------------------
+        // Map participants
+        //---------------------------------------
+
+        const mapped = customers.filter(Boolean).map((user) => ({
+          userId: user.id,
+          username: user.username,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          profile_picture: user.profile_picture || "",
+        }));
+
+        //---------------------------------------
+        // Remove duplicates
+        //---------------------------------------
+
+        const unique = [];
+        const seen = new Set();
+
+        mapped.forEach((person) => {
+          if (!seen.has(person.userId)) {
+            seen.add(person.userId);
+            unique.push(person);
+          }
+        });
+
+        unique.sort((a, b) => a.username.localeCompare(b.username));
+
+        setParticipants(unique);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -139,119 +214,139 @@ export default function DashboardMessages() {
     }
   }
 
-  const filteredWorkers = useMemo(() => {
-    if (!search.trim()) return workers;
+  //---------------------------------------
+  // Search
+  //---------------------------------------
+
+  const filteredParticipants = useMemo(() => {
+    if (!search.trim()) return participants;
 
     const value = search.toLowerCase();
 
-    return workers.filter((worker) => {
-      const full =
-        `${worker.first_name} ${worker.last_name}`.toLowerCase();
+    return participants.filter((person) => {
+      const full = `${person.first_name} ${person.last_name}`.toLowerCase();
 
       return (
-        worker.username.toLowerCase().includes(value) ||
-        full.includes(value)
+        person.username.toLowerCase().includes(value) || full.includes(value)
       );
     });
-  }, [workers, search]);
+  }, [participants, search]);
 
-  function initials(worker) {
-    const first = worker.first_name?.[0] || "";
-    const last = worker.last_name?.[0] || "";
+  //---------------------------------------
+  // Helpers
+  //---------------------------------------
 
-    return (first + last || worker.username[0]).toUpperCase();
+  function initials(person) {
+    const first = person.first_name?.[0] || "";
+    const last = person.last_name?.[0] || "";
+
+    return (first + last || person.username?.[0] || "U").toUpperCase();
   }
 
-  function openChat(worker) {
-    setSelectedWorker(worker);
+  function openChat(person) {
+    setSelectedParticipant(person);
     setShowChat(true);
   }
+
+  //---------------------------------------
+  // Loading
+  //---------------------------------------
 
   if (loading) {
     return (
       <div className="messages-loading">
-        Loading workers...
+        Loading {isCustomer ? "workers" : "customers"}...
       </div>
     );
   }
 
+  //---------------------------------------
+  // JSX
+  //---------------------------------------
+
   return (
     <>
       <div className="messages-page">
-
         <div className="messages-header">
           <div>
             <h2>Messages</h2>
-            <p>Chat with workers you've worked with.</p>
+
+            <p>
+              Chat with {isCustomer ? "workers" : "customers"} you've worked
+              with.
+            </p>
           </div>
 
           <div className="messages-count">
             <Users size={18} />
-            {workers.length}
+            {participants.length}
           </div>
         </div>
 
         <div className="messages-search">
           <Search size={18} />
+
           <input
-            placeholder="Search workers..."
+            placeholder={`Search ${isCustomer ? "workers" : "customers"}...`}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
         <div className="workers-list">
-
-          {filteredWorkers.length === 0 && (
+          {filteredParticipants.length === 0 && (
             <div className="workers-empty">
               <MessageCircle size={50} />
-              <h3>No Workers Found</h3>
-              <p>You haven't worked with any workers yet.</p>
+
+              <h3>No {isCustomer ? "Workers" : "Customers"} Found</h3>
+
+              <p>
+                You haven't worked with any{" "}
+                {isCustomer ? "workers" : "customers"} yet.
+              </p>
             </div>
           )}
 
-          {filteredWorkers.map((worker) => (
+          {filteredParticipants.map((person) => (
             <button
-              key={worker.userId}
+              key={person.userId}
               className="worker-row"
-              onClick={() => openChat(worker)}
+              onClick={() => openChat(person)}
             >
               <div className="worker-left">
-
-                {worker.profile_picture ? (
+                {person.profile_picture ? (
                   <img
-                    src={worker.profile_picture}
+                    src={person.profile_picture}
                     alt=""
                     className="worker-avatar"
                   />
                 ) : (
                   <div className="worker-avatar initials">
-                    {initials(worker)}
+                    {initials(person)}
                   </div>
                 )}
 
                 <div className="worker-info">
                   <h4>
-                    {worker.first_name} {worker.last_name}
+                    {person.first_name} {person.last_name}
                   </h4>
 
-                  <span>@{worker.username}</span>
+                  <span>@{person.username}</span>
                 </div>
               </div>
 
               <ChevronRight size={18} />
             </button>
           ))}
-
         </div>
       </div>
 
       <ChatModal
         open={showChat}
-        worker={selectedWorker}
+        participant={selectedParticipant}
         onClose={() => {
           setShowChat(false);
-          setSelectedWorker(null);
+          setSelectedParticipant(null);
         }}
       />
     </>
