@@ -147,8 +147,6 @@ export default function Profile() {
       //------------------------------
 
       await api.patch(`workerprofile/${profile.id}/`, {
-        profession: profile.profession,
-        experience_years: Number(profile.experience_years),
         location: profile.location,
         bio: profile.bio,
         hourly_rate: profile.hourly_rate,
@@ -302,28 +300,18 @@ export default function Profile() {
 
             <div className="profile-form">
               <div className="form-group">
-                <label>
-                  Profession <span>*</span>
-                </label>
+                <label>Profession</label>
 
-                <input
-                  name="profession"
-                  value={profile.profession}
-                  onChange={handleProfile}
-                />
+                <input value={profile.profession} disabled readOnly />
               </div>
 
               <div className="form-group">
-                <label>
-                  Experience (Years) <span>*</span>
-                </label>
+                <label>Experience (Years)</label>
 
                 <input
-                  type="number"
-                  min="0"
-                  name="experience_years"
-                  value={profile.experience_years}
-                  onChange={handleProfile}
+                  value={`${profile.experience_years} Years`}
+                  disabled
+                  readOnly
                 />
               </div>
 
