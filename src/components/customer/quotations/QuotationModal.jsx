@@ -1,17 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   X,
   MapPin,
-  Calendar,
   Clock3,
-  BadgeCheck,
-  Star,
-  Briefcase,
   Wallet,
+  Calendar,
+  BadgeCheck,
+  Briefcase,
+  Star,
   CheckCircle2,
   XCircle,
 } from "lucide-react";
+
 import { api } from "../../../services/api";
+import StkPopup from "../../StkPopup";
+
 import "../../../styles/quotationModal.css";
 
 export default function QuotationModal({
@@ -21,6 +24,12 @@ export default function QuotationModal({
   onUpdated,
 }) {
   const [loading, setLoading] = useState(false);
+
+  const [projectId, setProjectId] = useState(null);
+
+  const [paymentReceived, setPaymentReceived] = useState(false);
+
+  const [showStkPopup, setShowStkPopup] = useState(false);
 
   if (!isOpen || !quotation) return null;
 
@@ -35,9 +44,59 @@ export default function QuotationModal({
     job,
   } = quotation;
 
-  //------------------------------------------------
+  //----------------------------------------------------
+  // Load Project + Payment Status
+  //----------------------------------------------------
+
+  useEffect(() => {
+    if (!quotation) return;
+
+    loadProject();
+  }, [quotation]);
+
+  async function loadProject() {
+    try {
+      //--------------------------------
+      // Get every project
+      //--------------------------------
+
+      const response = await api.get("projects/");
+
+      const projects = Array.isArray(response)
+        ? response
+        : response.results || [];
+
+      //--------------------------------
+      // Find project belonging to job
+      //--------------------------------
+
+      const project = projects.find((p) => {
+        if (typeof p.job === "object") {
+          return p.job?.id === job.id;
+        }
+
+        return p.job === job.id;
+      });
+
+      if (!project) return;
+
+      setProjectId(project.id);
+
+      //--------------------------------
+      // Get payment_received
+      //--------------------------------
+
+      const fullProject = await api.get(`projects/${project.id}/`);
+
+      setPaymentReceived(fullProject.payment_received || false);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  //----------------------------------------------------
   // Helpers
-  //------------------------------------------------
+  //----------------------------------------------------
 
   const avatar =
     worker?.user?.profile_picture ||
@@ -50,9 +109,11 @@ export default function QuotationModal({
     : "0.0";
 
   const budget = Number(job?.budget || 0);
+
   const quotationAmount = Number(amount || 0);
 
   const difference = budget - quotationAmount;
+
   const withinBudget = difference >= 0;
 
   function badgeClass() {
@@ -68,35 +129,36 @@ export default function QuotationModal({
     }
   }
 
-  //------------------------------------------------
-  // Accept quotation
-  //------------------------------------------------
+  //----------------------------------------------------
+  // Accept
+  //----------------------------------------------------
 
   async function acceptQuotation() {
-    if (!window.confirm("Accept this quotation?")) return;
+    if (!window.confirm("Accept quotation?")) return;
 
     try {
       setLoading(true);
 
       await api.post(`quotations/${id}/accept/`);
 
-      onUpdated?.();
+      await loadProject();
 
-      onClose();
+      onUpdated?.();
     } catch (err) {
       console.error(err);
-      alert("Failed to accept quotation.");
+
+      alert("Unable to accept quotation.");
     } finally {
       setLoading(false);
     }
   }
 
-  //------------------------------------------------
-  // Reject quotation
-  //------------------------------------------------
+  //----------------------------------------------------
+  // Reject
+  //----------------------------------------------------
 
   async function rejectQuotation() {
-    if (!window.confirm("Reject this quotation?")) return;
+    if (!window.confirm("Reject quotation?")) return;
 
     try {
       setLoading(true);
@@ -104,23 +166,35 @@ export default function QuotationModal({
       await api.post(`quotations/${id}/reject/`);
 
       onUpdated?.();
-
-      onClose();
     } catch (err) {
       console.error(err);
-      alert("Failed to reject quotation.");
+
+      alert("Unable to reject quotation.");
     } finally {
       setLoading(false);
     }
   }
 
-  //------------------------------------------------
-  // JSX
-  //------------------------------------------------
+  //----------------------------------------------------
+  // Payment Success Callback
+  //----------------------------------------------------
+
+  function handlePaymentSuccess() {
+    setShowStkPopup(false);
+
+    loadProject();
+
+    onUpdated?.();
+  }
+
+  //----------------------------------------------------
+  // JSX STARTS BELOW
+  //----------------------------------------------------
 
   return (
-    <div className="quote-modal-overlay" onClick={onClose}>
-      <div className="quote-modal" onClick={(e) => e.stopPropagation()}>
+    <>
+      <div className="quote-modal-overlay" onClick={onClose}>
+        <div className="quote-modal" onClick={(e) => e.stopPropagation()}></div>
         {/* ================= HEADER ================= */}
 
         <div className="quote-modal-header">
@@ -219,6 +293,18 @@ export default function QuotationModal({
                   {new Date(job?.created_at).toLocaleDateString()}
                 </strong>
               </div>
+
+              {/* NEW */}
+
+              <div>
+                <span>Payment Received</span>
+
+                <strong
+                  className={paymentReceived ? "budget-good" : "budget-high"}
+                >
+                  {paymentReceived ? "True" : "False"}
+                </strong>
+              </div>
             </div>
 
             <div className="job-description">
@@ -228,6 +314,7 @@ export default function QuotationModal({
             </div>
           </div>
         </div>
+
         {/* ================= QUOTATION SUMMARY ================= */}
 
         <div className="quotation-summary-card">
@@ -240,19 +327,16 @@ export default function QuotationModal({
           <div className="summary-grid">
             <div className="summary-item">
               <span>Quoted Amount</span>
-
               <strong>KES {quotationAmount.toLocaleString()}</strong>
             </div>
 
             <div className="summary-item">
               <span>Estimated Duration</span>
-
               <strong>{estimated_days} Days</strong>
             </div>
 
             <div className="summary-item">
               <span>Submitted</span>
-
               <strong>{new Date(created_at).toLocaleDateString()}</strong>
             </div>
 
@@ -273,7 +357,7 @@ export default function QuotationModal({
           </div>
         </div>
 
-        {/* ================= BUDGET INSIGHT ================= */}
+        {/* ================= BUDGET CARD ================= */}
 
         <div
           className={
@@ -308,7 +392,6 @@ export default function QuotationModal({
             </>
           )}
         </div>
-
         {/* ================= ACTIONS ================= */}
 
         {status === "pending" && (
@@ -328,25 +411,50 @@ export default function QuotationModal({
               disabled={loading}
             >
               <CheckCircle2 size={18} />
-
               {loading ? "Processing..." : "Accept Quotation"}
             </button>
           </div>
         )}
 
         {status === "accepted" && (
-          <div className="quotation-finished accepted-box">
-            <CheckCircle2 size={24} />
+          <>
+            <div className="quotation-finished accepted-box">
+              <CheckCircle2 size={24} />
 
-            <div>
-              <h4>Quotation Accepted</h4>
+              <div>
+                <h4>Quotation Accepted</h4>
 
-              <p>
-                This quotation has already been accepted. The project can now
-                proceed.
-              </p>
+                <p>
+                  This quotation has already been accepted. The project can now
+                  proceed.
+                </p>
+              </div>
             </div>
-          </div>
+
+            {!paymentReceived && (
+              <div className="quotation-actions payment-action">
+                <button
+                  className="accept-btn payment-btn"
+                  onClick={() => setShowStkPopup(true)}
+                >
+                  <Wallet size={18} />
+                  Make Deposit
+                </button>
+              </div>
+            )}
+
+            {paymentReceived && (
+              <div className="quotation-finished accepted-box payment-complete">
+                <CheckCircle2 size={22} />
+
+                <div>
+                  <h4>Deposit Received</h4>
+
+                  <p>Deposit has already been received for this project.</p>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {status === "rejected" && (
@@ -360,7 +468,21 @@ export default function QuotationModal({
             </div>
           </div>
         )}
+
+        {/* ================= STK POPUP ================= */}
+
+        <StkPopup
+          open={showStkPopup}
+          onClose={() => setShowStkPopup(false)}
+          amount={quotationAmount}
+          projectId={projectId}
+          onSuccess={() => {
+            setShowStkPopup(false);
+            loadProject();
+            onUpdated?.();
+          }}
+        />
       </div>
-    </div>
+    </>
   );
 }
