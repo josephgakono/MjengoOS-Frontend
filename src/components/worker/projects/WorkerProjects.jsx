@@ -10,7 +10,7 @@ import {
 import { api } from "../../../services/api";
 import ProjectModal from "./ProjectModal";
 
-import "../../../styles/WorkerProjects.css";
+import "../../../styles/ProjectModal.css";
 
 export default function WorkerProjects() {
   const [projects, setProjects] = useState([]);

@@ -12,6 +12,7 @@ import {
 
 import { api } from "../../../services/api";
 
+import "../../../styles/ProjectModal.css";
 export default function ProjectModal({ open, project, onClose }) {
   const [job, setJob] = useState(null);
   const [updates, setUpdates] = useState([]);

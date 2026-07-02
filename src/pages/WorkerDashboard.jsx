@@ -6,6 +6,7 @@ import Profile from "../components/worker/Profile";
 import DashboardMessages from "../components/customer/DashboardMessages";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
 import "../styles/dashboard.css";
+import WorkerProjects from "../components/worker/projects/WorkerProjects";
 
 function getStoredUser() {
   try {
@@ -121,7 +122,7 @@ export default function WorkerDashboard() {
               setSidebarOpen={setSidebarOpen}
             />
 
-            <WorkerProjects />
+            <WorkerProjects/>
           </>
         )}
 
