@@ -1,0 +1,279 @@
+/* ==========================================
+   Worker Quotations
+========================================== */
+
+.quotation-page{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.quotation-top{
+  display:flex;
+  gap:16px;
+}
+
+.quote-stat{
+  flex:1;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:14px 18px;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+}
+
+.quote-stat svg{
+  color:#2563eb;
+}
+
+.quote-stat.accepted svg{
+  color:#16a34a;
+}
+
+.quote-stat.rejected svg{
+  color:#dc2626;
+}
+
+.quote-stat small{
+  display:block;
+  color:#6b7280;
+  font-size:.8rem;
+}
+
+.quote-stat strong{
+  font-size:1.35rem;
+  color:#111827;
+}
+
+.quotation-search{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  padding:10px 14px;
+}
+
+.quotation-search input{
+  flex:1;
+  border:none;
+  outline:none;
+  font-size:.95rem;
+  background:transparent;
+}
+
+/* ==========================================
+   Tables
+========================================== */
+
+.quotation-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+.quotation-table{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.quotation-table h3{
+  margin:0;
+  padding:14px 16px;
+  border-bottom:1px solid #e5e7eb;
+  font-size:1rem;
+}
+
+.table-wrapper{
+  overflow:auto;
+  max-height:470px;
+}
+
+.table-wrapper table{
+  width:100%;
+  min-width:520px;
+  border-collapse:collapse;
+}
+
+.table-wrapper th{
+  position:sticky;
+  top:0;
+  background:#f9fafb;
+  z-index:2;
+}
+
+.table-wrapper th,
+.table-wrapper td{
+  padding:12px 14px;
+  text-align:left;
+  white-space:nowrap;
+  border-bottom:1px solid #eef2f7;
+  font-size:.9rem;
+}
+
+.table-wrapper tbody tr{
+  cursor:pointer;
+  transition:.2s;
+}
+
+.table-wrapper tbody tr:hover{
+  background:#f8fafc;
+}
+
+/* ==========================================
+   Modal
+========================================== */
+
+.quotation-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:1000;
+}
+
+.quotation-modal{
+  width:min(700px,100%);
+  max-height:90vh;
+  overflow-y:auto;
+  background:#fff;
+  border-radius:12px;
+  animation:popup .2s ease;
+}
+
+@keyframes popup{
+
+from{
+opacity:0;
+transform:translateY(10px);
+}
+
+to{
+opacity:1;
+transform:none;
+}
+
+}
+
+.quotation-modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px 20px;
+  border-bottom:1px solid #e5e7eb;
+}
+
+.quotation-modal-header h2{
+  margin:0;
+  font-size:1.2rem;
+}
+
+.quotation-modal-header button{
+  border:none;
+  background:none;
+  cursor:pointer;
+}
+
+.quotation-section{
+  padding:18px 20px;
+  border-bottom:1px solid #eef2f7;
+}
+
+.quotation-section:last-child{
+  border-bottom:none;
+}
+
+.quotation-section h3{
+  margin:0 0 14px;
+  font-size:1rem;
+}
+
+.quotation-section p{
+  margin:8px 0;
+  line-height:1.55;
+}
+
+.description{
+  color:#4b5563;
+}
+
+.quotation-message{
+  margin-top:16px;
+  background:#f8fafc;
+  border-radius:8px;
+  padding:14px;
+}
+
+.quotation-message p{
+  margin-top:8px;
+}
+
+/* ==========================================
+   Status
+========================================== */
+
+.badge{
+  display:inline-block;
+  padding:5px 10px;
+  border-radius:30px;
+  font-size:.8rem;
+  font-weight:600;
+}
+
+.badge.accepted{
+  background:#dcfce7;
+  color:#15803d;
+}
+
+.badge.rejected{
+  background:#fee2e2;
+  color:#dc2626;
+}
+
+/* ==========================================
+   Loading
+========================================== */
+
+.quotation-loading{
+  padding:70px;
+  text-align:center;
+  color:#6b7280;
+}
+
+/* ==========================================
+   Responsive
+========================================== */
+
+@media(max-width:900px){
+
+.quotation-grid{
+grid-template-columns:1fr;
+}
+
+}
+
+@media(max-width:600px){
+
+.quotation-top{
+flex-direction:column;
+}
+
+.quotation-modal{
+width:100%;
+max-height:100vh;
+border-radius:0;
+}
+
+.table-wrapper table{
+min-width:460px;
+}
+
+}
