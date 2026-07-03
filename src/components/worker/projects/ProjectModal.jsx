@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+
 import {
   X,
   Calendar,
@@ -7,7 +8,6 @@ import {
   Upload,
   CheckCircle,
   Clock3,
-  Image as ImageIcon,
 } from "lucide-react";
 
 import { api } from "../../../services/api";
@@ -31,13 +31,53 @@ export default function ProjectModal({ open, project, onClose }) {
   // Load Data
   //--------------------------------------------------
 
+  // Fetch only when the modal opens for a specific project.
   useEffect(() => {
     if (!open || !project) return;
 
+    let cancelled = false;
+
+    async function loadData() {
+      try {
+        setLoading(true);
+
+        const [jobData, updatesData] = await Promise.all([
+          api.get(`jobs/${project.job}/`),
+          api.get("progress-updates/"),
+        ]);
+
+        if (cancelled) return;
+
+        const allUpdates = Array.isArray(updatesData)
+          ? updatesData
+          : updatesData.results || [];
+
+        setJob(jobData);
+
+        setUpdates(
+          allUpdates
+            .filter((u) => Number(u.project) === Number(project.id))
+            .sort(
+              (a, b) => new Date(b.created_at) - new Date(a.created_at),
+            ),
+        );
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
     loadData();
+
+    return () => {
+      cancelled = true;
+    };
   }, [open, project]);
 
-  async function loadData() {
+
+  // Reload helper for actions inside the modal.
+  async function reloadData() {
     try {
       setLoading(true);
 
@@ -63,6 +103,7 @@ export default function ProjectModal({ open, project, onClose }) {
       setLoading(false);
     }
   }
+
 
   //--------------------------------------------------
   // Form
@@ -108,7 +149,8 @@ export default function ProjectModal({ open, project, onClose }) {
 
       setMessage("Progress update posted.");
 
-      loadData();
+      reloadData();
+
     } catch (err) {
       console.error(err);
 
@@ -140,7 +182,7 @@ export default function ProjectModal({ open, project, onClose }) {
 
       setMessage("Project marked as completed.");
 
-      loadData();
+      reloadData();
     } catch (err) {
       console.error(err);
 
@@ -164,30 +206,33 @@ export default function ProjectModal({ open, project, onClose }) {
 
   if (loading) {
     return (
-      <>
-        <div className="modal-overlay" onClick={onClose} />
-
-        <div className="project-modal">Loading...</div>
-      </>
+      <div className="project-modal-overlay" onClick={onClose}>
+        <div className="project-modal" onClick={(e) => e.stopPropagation()}>
+          <div style={{ padding: "24px", textAlign: "center" }}>Loading...</div>
+        </div>
+      </div>
     );
   }
-  return (
-    <>
-      <div className="modal-overlay" onClick={onClose} />
 
-      <div className="project-modal">
+  return (
+    <div className="project-modal-overlay" onClick={onClose}>
+      <div className="project-modal" onClick={(e) => e.stopPropagation()}>
+
         {/* Header */}
+
 
         <div className="project-modal-header">
           <div>
+
             <h2>{job?.title}</h2>
 
             <p>{job?.location}</p>
           </div>
 
-          <button onClick={onClose}>
+          <button type="button" onClick={onClose}>
             <X size={22} />
           </button>
+
         </div>
 
         {/* Body */}
@@ -356,6 +401,6 @@ export default function ProjectModal({ open, project, onClose }) {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

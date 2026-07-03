@@ -1,30 +1,39 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  Search,
   BriefcaseBusiness,
   CheckCircle2,
+  ChevronRight,
   Clock3,
+  ClipboardList,
   Wallet,
+  Search,
+  MapPin,
+  Calendar,
+  Plus,
+  FolderKanban,
+  CalendarDays,
 } from "lucide-react";
 
 import { api } from "../../../services/api";
 import ProjectModal from "./ProjectModal";
 
 import "../../../styles/ProjectModal.css";
+import "../../../styles/Jobs.css";
 
 export default function WorkerProjects() {
-  const [projects, setProjects] = useState([]);
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+
   const [loading, setLoading] = useState(true);
+  const [projects, setProjects] = useState([]);
 
   const [search, setSearch] = useState("");
 
   const [selectedProject, setSelectedProject] = useState(null);
-
   const [showModal, setShowModal] = useState(false);
 
-  //--------------------------------------------------
-  // Load Projects
-  //--------------------------------------------------
+  //-------------------------------------------------------
+  // LOAD PROJECTS
+  //-------------------------------------------------------
 
   useEffect(() => {
     loadProjects();
@@ -34,31 +43,44 @@ export default function WorkerProjects() {
     try {
       setLoading(true);
 
-      // Current worker profile
+      //---------------------------------------------------
+      // Find logged in worker profile
+      //---------------------------------------------------
 
-      const workerResponse = await api.get("workerprofile/");
+      const workerProfiles = await api.get("workerprofile/");
 
-      const worker = Array.isArray(workerResponse)
-        ? workerResponse[0]
-        : workerResponse;
+      const profiles = Array.isArray(workerProfiles)
+        ? workerProfiles
+        : workerProfiles.results || [];
 
-      // All projects
-
-      const projectsResponse = await api.get("projects/");
-
-      const allProjects = Array.isArray(projectsResponse)
-        ? projectsResponse
-        : projectsResponse.results || [];
-
-      // Only mine
-
-      const myProjects = allProjects.filter(
-        (project) => Number(project.worker) === Number(worker.id),
+      const myProfile = profiles.find(
+        (profile) => Number(profile.user) === Number(currentUser.id),
       );
 
-      // Attach job information
+      if (!myProfile) {
+        setProjects([]);
+        return;
+      }
 
-      const data = await Promise.all(
+      //---------------------------------------------------
+      // Load projects
+      //---------------------------------------------------
+
+      const projectResponse = await api.get("projects/");
+
+      const allProjects = Array.isArray(projectResponse)
+        ? projectResponse
+        : projectResponse.results || [];
+
+      const myProjects = allProjects.filter(
+        (project) => Number(project.worker) === Number(myProfile.id),
+      );
+
+      //---------------------------------------------------
+      // Attach Job Information
+      //---------------------------------------------------
+
+      const fullProjects = await Promise.all(
         myProjects.map(async (project) => {
           try {
             const job = await api.get(`jobs/${project.job}/`);
@@ -76,9 +98,11 @@ export default function WorkerProjects() {
         }),
       );
 
-      data.sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
+      fullProjects.sort(
+        (a, b) => new Date(b.start_date) - new Date(a.start_date),
+      );
 
-      setProjects(data);
+      setProjects(fullProjects);
     } catch (err) {
       console.error(err);
     } finally {
@@ -86,27 +110,9 @@ export default function WorkerProjects() {
     }
   }
 
-  //--------------------------------------------------
-  // Statistics
-  //--------------------------------------------------
-
-  const stats = useMemo(() => {
-    return {
-      total: projects.length,
-
-      active: projects.filter((p) => p.status !== "completed").length,
-
-      completed: projects.filter((p) => p.status === "completed").length,
-
-      escrow: projects.filter(
-        (p) => p.payment_received && p.status !== "completed",
-      ).length,
-    };
-  }, [projects]);
-
-  //--------------------------------------------------
-  // Search
-  //--------------------------------------------------
+  //-------------------------------------------------------
+  // SEARCH
+  //-------------------------------------------------------
 
   const filteredProjects = useMemo(() => {
     if (!search.trim()) return projects;
@@ -115,164 +121,200 @@ export default function WorkerProjects() {
 
     return projects.filter((project) => {
       const title = project.job?.title?.toLowerCase() || "";
-
       const location = project.job?.location?.toLowerCase() || "";
 
       return title.includes(value) || location.includes(value);
     });
   }, [projects, search]);
 
-  //--------------------------------------------------
-  // Lists
-  //--------------------------------------------------
+  //-------------------------------------------------------
+  // STATS + SPLIT
+  //-------------------------------------------------------
 
-  const activeProjects = filteredProjects.filter(
-    (project) => project.status !== "completed",
+  const stats = useMemo(() => {
+    const active = filteredProjects.filter((p) => p.status !== "completed");
+
+    const completed = filteredProjects.filter((p) => p.status === "completed");
+
+    return {
+      total: filteredProjects.length,
+      active: active.length,
+      completed: completed.length,
+      escrow: active.filter((p) => p.payment_received).length,
+    };
+  }, [filteredProjects]);
+
+  const activeProjects = useMemo(
+    () => filteredProjects.filter((p) => p.status !== "completed"),
+    [filteredProjects],
   );
 
-  const completedProjects = filteredProjects.filter(
-    (project) => project.status === "completed",
+  const completedProjects = useMemo(
+    () => filteredProjects.filter((p) => p.status === "completed"),
+    [filteredProjects],
   );
 
-  //--------------------------------------------------
-  // Helpers
-  //--------------------------------------------------
+  //-------------------------------------------------------
+  // HELPERS
+  //-------------------------------------------------------
 
-  const formatDate = (date) =>
-    date ? new Date(date).toLocaleDateString() : "--";
+  function formatDate(date) {
+    if (!date) return "--";
+
+    return new Date(date).toLocaleDateString();
+  }
 
   function openProject(project) {
     setSelectedProject(project);
     setShowModal(true);
   }
 
-  if (loading) {
-    return <div className="worker-projects-loading">Loading projects...</div>;
-  }
-  return (
-    <>
-      <div className="worker-projects-page">
-        {/* Stats */}
+  function ProjectCard({ project, completed }) {
+    return (
+      <button className="job-item" onClick={() => openProject(project)}>
+        <div className="job-item-top">
+          <div>
+            <h4>{project.job?.title || "Untitled Project"}</h4>
 
-        <div className="worker-project-stats">
-          {[
-            {
-              title: "Total Projects",
-              value: stats.total,
-              icon: <BriefcaseBusiness size={20} />,
-            },
-            {
-              title: "Active",
-              value: stats.active,
-              icon: <Clock3 size={20} />,
-            },
-            {
-              title: "Completed",
-              value: stats.completed,
-              icon: <CheckCircle2 size={20} />,
-            },
-            {
-              title: "Escrow Holding",
-              value: stats.escrow,
-              icon: <Wallet size={20} />,
-            },
-          ].map((card) => (
-            <div className="worker-project-stat-card" key={card.title}>
-              <div className="icon">{card.icon}</div>
+            <div className="job-meta">
+              <span>
+                <MapPin size={14} />
+                {project.job?.location || "Location not provided"}
+              </span>
 
-              <div>
-                <h4>{card.title}</h4>
-                <strong>{card.value}</strong>
-              </div>
+              <span>
+                <Calendar size={14} />
+                {formatDate(project.start_date)}
+              </span>
             </div>
-          ))}
+          </div>
+
+          <ChevronRight size={18} />
         </div>
 
-        {/* Search */}
+        <div className="job-item-bottom">
+          <span className={completed ? "status completed" : "status active"}>
+            {completed ? "Completed" : "Active"}
+          </span>
 
-        <div className="worker-project-search">
+          <span className="view-text">View Details</span>
+        </div>
+      </button>
+    );
+  }
+
+  //-------------------------------------------------------
+  // LOADING
+  //-------------------------------------------------------
+
+  if (loading) {
+    return <div className="jobs-loading">Loading projects...</div>;
+  }
+
+  //-------------------------------------------------------
+  // JSX
+  //-------------------------------------------------------
+
+  return (
+    <>
+      <div className="jobs-summary">
+        <div className="summary-card blue">
+          <div>
+            <span>Active Projects</span>
+            <h2>{activeProjects.length}</h2>
+          </div>
+          <Clock3 size={34} />
+        </div>
+
+        <div className="summary-card purple">
+          <div>
+            <span>Completed Projects</span>
+            <h2>{completedProjects.length}</h2>
+          </div>
+          <CheckCircle2 size={34} />
+        </div>
+
+        <div className="summary-card orange">
+          <div>
+            <span>Escrow Holding</span>
+            <h2>{stats.escrow}</h2>
+          </div>
+          <Wallet size={34} />
+        </div>
+      </div>
+
+      <div className="jobs-container">
+        <div className="jobs-header">
+          <div>
+            <h2>My Projects</h2>
+            <p>Manage your assigned projects, upload progress updates.</p>
+          </div>
+
+          <button className="post-job-btn" type="button" disabled>
+            <Plus size={18} />
+            Projects
+          </button>
+        </div>
+
+        <div className="messages-search" style={{ marginBottom: 18 }}>
           <Search size={18} />
-
           <input
+            type="text"
             placeholder="Search projects..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        {/* Lists */}
+        <div className="jobs-columns">
+          <div className="jobs-column">
+            <div className="column-header">
+              <h3>Active Projects</h3>
+              <span>{activeProjects.length}</span>
+            </div>
 
-        <div className="worker-project-columns">
-          {/* Active */}
-
-          <div className="project-column">
-            <h3>Active Projects ({activeProjects.length})</h3>
-
-            {activeProjects.length === 0 ? (
-              <div className="project-empty">No active projects.</div>
-            ) : (
-              activeProjects.map((project) => (
-                <div
-                  key={project.id}
-                  className="project-card"
-                  onClick={() => openProject(project)}
-                >
-                  <div className="project-card-header">
-                    <h4>{project.job?.title || "Untitled Job"}</h4>
-
-                    <span className="status active">Active</span>
-                  </div>
-
-                  <p>{project.job?.location}</p>
-
-                  <div className="project-meta">
-                    <span>Started: {formatDate(project.start_date)}</span>
-
-                    <span>Due: {formatDate(project.expected_completion)}</span>
-                  </div>
+            <div className="jobs-scroll">
+              {activeProjects.length > 0 ? (
+                activeProjects.map((project) => (
+                  <ProjectCard key={project.id} project={project} />
+                ))
+              ) : (
+                <div className="empty-state">
+                  <Clock3 size={44} />
+                  <p>No active projects found.</p>
                 </div>
-              ))
-            )}
+              )}
+            </div>
           </div>
 
-          {/* Completed */}
+          <div className="jobs-column">
+            <div className="column-header">
+              <h3>Completed Projects</h3>
+              <span>{completedProjects.length}</span>
+            </div>
 
-          <div className="project-column">
-            <h3>Completed Projects ({completedProjects.length})</h3>
-
-            {completedProjects.length === 0 ? (
-              <div className="project-empty">No completed projects.</div>
-            ) : (
-              completedProjects.map((project) => (
-                <div
-                  key={project.id}
-                  className="project-card completed"
-                  onClick={() => openProject(project)}
-                >
-                  <div className="project-card-header">
-                    <h4>{project.job?.title || "Untitled Job"}</h4>
-
-                    <span className="status completed">Completed</span>
-                  </div>
-
-                  <p>{project.job?.location}</p>
-
-                  <div className="project-meta">
-                    <span>Started: {formatDate(project.start_date)}</span>
-
-                    <span>
-                      Finished: {formatDate(project.actual_completion)}
-                    </span>
-                  </div>
+            <div className="jobs-scroll">
+              {completedProjects.length > 0 ? (
+                completedProjects.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    completed
+                  />
+                ))
+              ) : (
+                <div className="empty-state">
+                  <CheckCircle2 size={44} />
+                  <p>No completed projects yet.</p>
                 </div>
-              ))
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       <ProjectModal
-        open={showModal}
+        open={showModal && selectedProject}
         project={selectedProject}
         onClose={() => {
           setShowModal(false);
@@ -283,3 +325,4 @@ export default function WorkerProjects() {
     </>
   );
 }
+
