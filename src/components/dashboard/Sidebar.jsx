@@ -38,11 +38,6 @@ export default function Sidebar({
       icon: <FolderKanban size={20} />,
     },
     {
-      name: "Escrow Center",
-      tab: "escrow",
-      icon: <ShieldCheck size={20} />,
-    },
-    {
       name: "Payments",
       tab: "payments",
       icon: <CreditCard size={20} />,

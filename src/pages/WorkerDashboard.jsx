@@ -8,6 +8,7 @@ import DashboardHeader from "../components/dashboard/DashboardHeader";
 import "../styles/dashboard.css";
 import WorkerProjects from "../components/worker/projects/WorkerProjects";
 import WorkerQuotations from "../components/worker/WorkerQuotations";
+import WorkerJobs from "../components/worker/WorkerJobs";
 
 function getStoredUser() {
   try {

@@ -349,7 +349,7 @@ export default function CustomerProjects() {
       </div>
 
       <CustomerProjectModal
-        open={showModal}
+        open={showModal && selectedProject}
         project={selectedProject}
         onClose={() => {
           setShowModal(false);
