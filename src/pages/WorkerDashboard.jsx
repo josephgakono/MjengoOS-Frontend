@@ -9,6 +9,7 @@ import "../styles/dashboard.css";
 import WorkerProjects from "../components/worker/projects/WorkerProjects";
 import WorkerQuotations from "../components/worker/WorkerQuotations";
 import WorkerJobs from "../components/worker/WorkerJobs";
+import DashboardPage from "../components/worker/DashboardPage";
 
 function getStoredUser() {
   try {
@@ -71,23 +72,11 @@ export default function WorkerDashboard() {
       />
 
       <main className="dashboard-main">
-
         {/* ================= Dashboard ================= */}
-
-        {/* {activeTab === "dashboard" && (
-          <>
-            <DashboardHeader
-              title="Worker Dashboard"
-              subtitle="Manage quotations, projects, jobs, earnings and messages."
-              setSidebarOpen={setSidebarOpen}
-            />
-
-            <WorkerDashboardHome />
-          </>
+        {activeTab === "dashboard" && (
+          <DashboardPage setActiveTab={setActiveTab} />
         )}
-
-        {/* ================= Available Jobs ================= */}
-
+        {/*================= Available Jobs ================= */}
         {activeTab === "jobs" && (
           <>
             <DashboardHeader
@@ -99,9 +88,7 @@ export default function WorkerDashboard() {
             <WorkerJobs />
           </>
         )}
-
         {/* ================= My Quotations ================= */}
-
         {activeTab === "quotations" && (
           <>
             <DashboardHeader
@@ -113,9 +100,7 @@ export default function WorkerDashboard() {
             <WorkerQuotations />
           </>
         )}
-
         {/* ================= Projects ================= */}
-
         {activeTab === "projects" && (
           <>
             <DashboardHeader
@@ -124,12 +109,10 @@ export default function WorkerDashboard() {
               setSidebarOpen={setSidebarOpen}
             />
 
-            <WorkerProjects/>
+            <WorkerProjects />
           </>
         )}
-
         {/* ================= Payments ================= */}
-
         {activeTab === "payments" && (
           <>
             <DashboardHeader
@@ -141,9 +124,7 @@ export default function WorkerDashboard() {
             <WorkerPayments />
           </>
         )}
-
         {/* ================= Messages ================= */}
-
         {activeTab === "messages" && (
           <>
             <DashboardHeader
@@ -155,9 +136,7 @@ export default function WorkerDashboard() {
             <DashboardMessages />
           </>
         )}
-
         {/* ================= Profile ================= */}
-
         {activeTab === "profile" && (
           <>
             <DashboardHeader
@@ -168,8 +147,7 @@ export default function WorkerDashboard() {
 
             <Profile />
           </>
-        )} 
-
+        )}
       </main>
     </div>
   );
