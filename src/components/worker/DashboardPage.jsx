@@ -10,11 +10,11 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-import { api } from "../../../services/api";
+import { api } from "../../services/api";
 
-import "../../../styles/WorkerDashboard.css";
+import "../../styles/WorkerDashboard.css";
 
-export default function DashboardPage() {
+export default function DashboardPage({ setActiveTab }) {
   const [loading, setLoading] = useState(true);
 
   const [profile, setProfile] = useState(null);
@@ -419,23 +419,23 @@ export default function DashboardPage() {
       <div className="dashboard-panel quick-actions">
         <h2>Quick Actions</h2>
 
-        <div className="action-buttons">
-          <button onClick={() => (window.location.href = "/worker/jobs")}>
-            Browse Jobs
-          </button>
+      <div className="action-buttons">
+    <button onClick={() => setActiveTab("jobs")}>
+        Browse Jobs
+    </button>
 
-          <button onClick={() => (window.location.href = "/worker/projects")}>
-            My Projects
-          </button>
+    <button onClick={() => setActiveTab("projects")}>
+        My Projects
+    </button>
 
-          <button onClick={() => (window.location.href = "/worker/messages")}>
-            Messages
-          </button>
+    <button onClick={() => setActiveTab("messages")}>
+        Messages
+    </button>
 
-          <button onClick={() => (window.location.href = "/worker/profile")}>
-            Edit Profile
-          </button>
-        </div>
+    <button onClick={() => setActiveTab("profile")}>
+        Edit Profile
+    </button>
+</div>
       </div>
     </div>
   );
