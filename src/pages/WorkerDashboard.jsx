@@ -10,6 +10,7 @@ import WorkerProjects from "../components/worker/projects/WorkerProjects";
 import WorkerQuotations from "../components/worker/WorkerQuotations";
 import WorkerJobs from "../components/worker/WorkerJobs";
 import DashboardPage from "../components/worker/DashboardPage";
+import WorkerPayments from "../components/worker/WorkerPayments";
 
 function getStoredUser() {
   try {
