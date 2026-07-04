@@ -1,9 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
-import { Search, CheckCircle2, XCircle, X } from "lucide-react";
+import {
+  Search,
+  CheckCircle2,
+  XCircle,
+  X,
+  ClipboardList,
+  Wallet,
+  MapPin,
+  Calendar,
+} from "lucide-react";
+
 
 import { api } from "../../services/api";
 
 import "../../styles/Quotation.css";
+import "../../styles/Jobs.css";
 
 export default function WorkerQuotations() {
   const [loading, setLoading] = useState(true);
@@ -13,6 +24,7 @@ export default function WorkerQuotations() {
   const [search, setSearch] = useState("");
 
   const [selected, setSelected] = useState(null);
+
 
   //--------------------------------------------------
   // Load Data
@@ -99,25 +111,31 @@ export default function WorkerQuotations() {
   const rejected = quotations.filter((q) => q.status === "rejected");
 
   //--------------------------------------------------
-  // Search
+  // Search (merged list)
   //--------------------------------------------------
 
-  const filterTable = (list) => {
-    if (!search.trim()) return list;
+  const filteredQuotations = useMemo(() => {
+    if (!search.trim()) return quotations;
 
     const value = search.toLowerCase();
 
-    return list.filter((q) => {
-      return (
-        q.job?.title?.toLowerCase().includes(value) ||
-        q.customer?.username?.toLowerCase().includes(value)
-      );
+    return quotations.filter((q) => {
+      const title = q.job?.title?.toLowerCase() || "";
+      const username = q.customer?.username?.toLowerCase() || "";
+      return title.includes(value) || username.includes(value);
     });
-  };
+  }, [quotations, search]);
 
-  const acceptedList = useMemo(() => filterTable(accepted), [accepted, search]);
+  const acceptedList = useMemo(
+    () => filteredQuotations.filter((q) => q.status === "accepted"),
+    [filteredQuotations],
+  );
 
-  const rejectedList = useMemo(() => filterTable(rejected), [rejected, search]);
+  const rejectedList = useMemo(
+    () => filteredQuotations.filter((q) => q.status === "rejected"),
+    [filteredQuotations],
+  );
+
 
   //--------------------------------------------------
   // Helpers
@@ -140,33 +158,12 @@ export default function WorkerQuotations() {
   return (
     <>
       <div className="quotation-page">
-        {/* Top */}
 
-        <div className="quotation-top">
-          <div className="quote-stat accepted">
-            <CheckCircle2 size={18} />
 
-            <div>
-              <small>Accepted</small>
-
-              <strong>{accepted.length}</strong>
-            </div>
-          </div>
-
-          <div className="quote-stat rejected">
-            <XCircle size={18} />
-
-            <div>
-              <small>Rejected</small>
-
-              <strong>{rejected.length}</strong>
-            </div>
-          </div>
-        </div>
 
         {/* Search */}
 
-        <div className="quotation-search">
+        <div className="quotation-search" style={{ marginBottom: 18 }}>
           <Search size={18} />
 
           <input
@@ -176,72 +173,105 @@ export default function WorkerQuotations() {
           />
         </div>
 
-        {/* Tables */}
 
-        <div className="quotation-grid">
-          {/* Accepted */}
+        {/* Tables (merged dataset, split into 2 columns by status) */}
 
-          <div className="quotation-table">
-            <h3>Accepted Quotations</h3>
-
-            <div className="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Job</th>
-
-                    <th>Budget</th>
-
-                    <th>Date</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {acceptedList.map((q) => (
-                    <tr key={q.id} onClick={() => setSelected(q)}>
-                      <td>{q.job?.title}</td>
-
-                      <td>KES {money(q.job?.budget)}</td>
-
-                      <td>{date(q.created_at)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        <div className="jobs-container">
+            <div className="jobs-header">
+            <div>
+              <h2>My Quotations</h2>
+              <p>Review accepted and rejected quotation requests.</p>
             </div>
           </div>
-          {/* Rejected */}
 
-          <div className="quotation-table">
-            <h3>Rejected Quotations</h3>
 
-            <div className="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Job</th>
+          <div className="jobs-columns">
+            <div className="jobs-column">
+              <div className="column-header">
+                <h3>Accepted Quotations</h3>
+                <span>{acceptedList.length}</span>
+              </div>
 
-                    <th>Budget</th>
+              <div className="jobs-scroll">
+                {acceptedList.length > 0 ? (
+                  acceptedList.map((q) => (
+                    <button key={q.id} className="job-item" onClick={() => setSelected(q)}>
+                      <div className="job-item-top">
+                        <div>
+                          <h4>{q.job?.title || "Untitled Job"}</h4>
+                          <div className="job-meta">
+                            <span>
+                              <ClipboardList size={14} />
+                              {q.job?.location || "Location not provided"}
+                            </span>
+                            <span>
+                              <Wallet size={14} />
+                              KES {money(q.job?.budget)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
 
-                    <th>Date</th>
-                  </tr>
-                </thead>
+                      <div className="job-item-bottom">
+                        <span className="status accepted">Accepted</span>
+                        <span className="view-text">{date(q.created_at)}</span>
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className="empty-state">
+                    <CheckCircle2 size={44} />
+                    <p>No accepted quotations found.</p>
+                  </div>
+                )}
+              </div>
+            </div>
 
-                <tbody>
-                  {rejectedList.map((q) => (
-                    <tr key={q.id} onClick={() => setSelected(q)}>
-                      <td>{q.job?.title}</td>
+            <div className="jobs-column">
+              <div className="column-header">
+                <h3>Rejected Quotations</h3>
+                <span>{rejectedList.length}</span>
+              </div>
 
-                      <td>KES {money(q.job?.budget)}</td>
+              <div className="jobs-scroll">
+                {rejectedList.length > 0 ? (
+                  rejectedList.map((q) => (
+                    <button key={q.id} className="job-item" onClick={() => setSelected(q)}>
+                      <div className="job-item-top">
+                        <div>
+                          <h4>{q.job?.title || "Untitled Job"}</h4>
+                          <div className="job-meta">
+                            <span>
+                              <ClipboardList size={14} />
+                              {q.job?.location || "Location not provided"}
+                            </span>
+                            <span>
+                              <Wallet size={14} />
+                              KES {money(q.job?.budget)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
 
-                      <td>{date(q.created_at)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      <div className="job-item-bottom">
+                        <span className="status rejected">Rejected</span>
+                        <span className="view-text">{date(q.created_at)}</span>
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className="empty-state">
+                    <XCircle size={44} />
+                    <p>No rejected quotations found.</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
+
+
+
       </div>
 
       {/* ==========================
