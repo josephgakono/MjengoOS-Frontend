@@ -18,12 +18,18 @@
 
 .stat-card{
     background:#fff;
-    border:1px solid #e5e7eb;
+    border:1px solid #e2e8f0;
     border-radius:12px;
-    padding:16px;
+    padding:18px;
     display:flex;
     align-items:center;
     gap:14px;
+    transition:.25s;
+}
+
+.stat-card:hover{
+    border-color:#2563eb;
+    transform:translateY(-2px);
 }
 
 .stat-card svg{

@@ -543,20 +543,57 @@ a{
 
 /* ======================================================
    GENERAL CARD
+   (WorkerDashboard-style) 
 ====================================================== */
 
 .card{
     background:#fff;
-
-    border-radius:22px;
-
+    border:1px solid #e2e8f0;
+    border-radius:12px;
     padding:22px;
+    box-shadow:none;
+    overflow:hidden;
+    transition:.25s;
+}
 
-    box-shadow:
-        0 6px 25px rgba(0,0,0,.05);
+/* ======================================================
+   Card parity (WorkerDashboard look)
+   This section intentionally makes customer dashboard cards
+   match the WorkerDashboard card visual style.
+====================================================== */
 
+.card,
+.stat-card,
+.escrow-card{
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:12px;
+    padding:18px;
+    box-shadow:none;
     overflow:hidden;
 }
+
+.card:hover,
+.stat-card:hover,
+.escrow-card:hover{
+    border-color:#2563eb;
+    transform:translateY(-2px);
+    transition:.25s;
+}
+
+.card h3,
+.stat-card h4,
+.escrow-card h5{
+    color:#0f172a;
+}
+
+.card:hover{
+    border-color:#2563eb;
+    transform:translateY(-2px);
+}
+
+
+
 
 .card-header{
     display:flex;
