@@ -1,0 +1,383 @@
+/* ==========================================
+   Worker Dashboard
+========================================== */
+
+.worker-dashboard{
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+}
+
+.worker-dashboard-loading{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:60vh;
+    font-size:1rem;
+    color:#64748b;
+}
+
+/* ==========================================
+   Header
+========================================== */
+
+.dashboard-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.dashboard-header h1{
+    margin:0;
+    font-size:1.8rem;
+    color:#0f172a;
+}
+
+.dashboard-header p{
+    margin-top:6px;
+    color:#64748b;
+}
+
+.dashboard-profile{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.dashboard-profile img,
+.dashboard-avatar{
+    width:54px;
+    height:54px;
+    border-radius:50%;
+    object-fit:cover;
+    background:#2563eb;
+    color:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:700;
+    font-size:1.1rem;
+}
+
+.dashboard-profile strong{
+    display:block;
+    color:#0f172a;
+}
+
+.dashboard-profile span{
+    color:#64748b;
+    font-size:.9rem;
+}
+
+/* ==========================================
+   Statistics
+========================================== */
+
+.dashboard-stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:16px;
+}
+
+.dashboard-card{
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:12px;
+    padding:18px;
+    transition:.25s;
+}
+
+.dashboard-card:hover{
+    border-color:#2563eb;
+    transform:translateY(-2px);
+}
+
+.dashboard-card svg{
+    color:#2563eb;
+    margin-bottom:10px;
+}
+
+.dashboard-card h3{
+    margin:0;
+    font-size:1.45rem;
+    color:#0f172a;
+}
+
+.dashboard-card p{
+    margin:6px 0;
+    color:#64748b;
+    font-size:.92rem;
+}
+
+.dashboard-card small{
+    color:#94a3b8;
+}
+
+/* ==========================================
+   Grid
+========================================== */
+
+.dashboard-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+    gap:20px;
+}
+
+.dashboard-panel{
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:12px;
+    padding:20px;
+}
+
+.panel-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:18px;
+}
+
+.panel-header h2{
+    margin:0;
+    font-size:1.1rem;
+    color:#0f172a;
+}
+
+.panel-header svg{
+    color:#2563eb;
+}
+
+/* ==========================================
+   Performance
+========================================== */
+
+.performance-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0;
+    border-bottom:1px solid #f1f5f9;
+}
+
+.performance-item:last-child{
+    border-bottom:none;
+}
+
+.performance-item span{
+    color:#64748b;
+}
+
+.performance-item strong{
+    color:#0f172a;
+}
+
+/* ==========================================
+   Profile Completion
+========================================== */
+
+.profile-completion{
+    margin-top:20px;
+}
+
+.completion-header{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:8px;
+    font-size:.9rem;
+}
+
+.completion-bar{
+    height:8px;
+    background:#e2e8f0;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.completion-fill{
+    height:100%;
+    background:#22c55e;
+    border-radius:20px;
+}
+
+/* ==========================================
+   Current Project
+========================================== */
+
+.current-project h3{
+    margin:0 0 12px;
+    color:#0f172a;
+}
+
+.current-project p{
+    margin:8px 0;
+    color:#64748b;
+}
+
+.project-status{
+    display:inline-block;
+    margin:12px 0;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:.82rem;
+    font-weight:600;
+    text-transform:capitalize;
+}
+
+.project-status.completed{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.project-status.active,
+.project-status.in_progress{
+    background:#dbeafe;
+    color:#2563eb;
+}
+
+.dashboard-btn{
+    margin-top:15px;
+    border:none;
+    background:#2563eb;
+    color:#fff;
+    padding:10px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    transition:.25s;
+}
+
+.dashboard-btn:hover{
+    background:#1d4ed8;
+}
+
+/* ==========================================
+   Table
+========================================== */
+
+.dashboard-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.dashboard-table th{
+    text-align:left;
+    padding-bottom:12px;
+    color:#64748b;
+    font-size:.88rem;
+}
+
+.dashboard-table td{
+    padding:12px 0;
+    border-top:1px solid #f1f5f9;
+    color:#334155;
+}
+
+/* ==========================================
+   Messages
+========================================== */
+
+.message-list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.message-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    padding:12px;
+    border:1px solid #e2e8f0;
+    border-radius:10px;
+}
+
+.message-item p{
+    margin:0;
+    color:#0f172a;
+}
+
+.message-item small{
+    color:#94a3b8;
+}
+
+.message-dot{
+    width:10px;
+    height:10px;
+    background:#2563eb;
+    border-radius:50%;
+}
+
+/* ==========================================
+   Empty
+========================================== */
+
+.dashboard-empty{
+    color:#94a3b8;
+    text-align:center;
+    padding:40px 0;
+}
+
+/* ==========================================
+   Quick Actions
+========================================== */
+
+.quick-actions h2{
+    margin-top:0;
+}
+
+.action-buttons{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+    gap:14px;
+    margin-top:18px;
+}
+
+.action-buttons button{
+    border:none;
+    cursor:pointer;
+    padding:12px;
+    border-radius:10px;
+    background:#2563eb;
+    color:#fff;
+    font-weight:600;
+    transition:.25s;
+}
+
+.action-buttons button:hover{
+    background:#1d4ed8;
+}
+
+/* ==========================================
+   Mobile
+========================================== */
+
+@media (max-width:768px){
+
+.dashboard-header{
+    flex-direction:column;
+    align-items:flex-start;
+}
+
+.dashboard-stats{
+    grid-template-columns:1fr;
+}
+
+.dashboard-grid{
+    grid-template-columns:1fr;
+}
+
+.dashboard-table{
+    display:block;
+    overflow-x:auto;
+}
+
+.action-buttons{
+    grid-template-columns:1fr;
+}
+
+}
