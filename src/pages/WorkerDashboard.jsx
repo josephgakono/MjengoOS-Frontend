@@ -11,6 +11,7 @@ import WorkerQuotations from "../components/worker/WorkerQuotations";
 import WorkerJobs from "../components/worker/WorkerJobs";
 import DashboardPage from "../components/worker/DashboardPage";
 import WorkerPayments from "../components/worker/WorkerPayments";
+import WorkerReviews from "../components/worker/WorkerReview";
 
 function getStoredUser() {
   try {
@@ -135,6 +136,17 @@ export default function WorkerDashboard() {
             />
 
             <DashboardMessages />
+          </>
+        )}
+        {activeTab === "reviews" && (
+          <>
+            <DashboardHeader
+              title="Reviews"
+              subtitle="View reviews from your past completed projects"
+              setSidebarOpen={setSidebarOpen}
+            />
+
+            <WorkerReviews />
           </>
         )}
         {/* ================= Profile ================= */}
