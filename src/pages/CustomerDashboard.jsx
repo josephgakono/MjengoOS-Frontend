@@ -8,7 +8,7 @@ import JobsTable from "../components/dashboard/JobsTable";
 import ActivityTimeline from "../components/dashboard/ActivityTimeline";
 import EscrowOverview from "../components/dashboard/EscrowOverview";
 import ProjectsChart from "../components/dashboard/ProjectsChart";
-import PostJobModal from "../components/Jobs/PostJobModal";
+import PostJobModal from "../components/Jobs/PostJobModal.jsx";
 import "../styles/dashboard.css";
 import QuotationsPage from "../components/customer/quotations/QuotationsPage";
 import DashboardHeader from "../components/dashboard/DashboardHeader";
