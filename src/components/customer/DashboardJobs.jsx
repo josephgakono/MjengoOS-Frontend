@@ -8,7 +8,7 @@ import {
   Calendar,
   ChevronRight,
 } from "lucide-react";
-import JobModal from "../jobs/JobModal";
+import JobModal from "../Jobs/JobModal.jsx";
 import { api } from "../../services/api";
 import "../../styles/Jobs.css";
 
