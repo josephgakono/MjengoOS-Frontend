@@ -157,9 +157,20 @@ export default function Profile() {
 
       await loadProfile();
     } catch (err) {
-      console.error(err);
-      setError("Unable to update profile.");
-    } finally {
+  console.error("Update Error:", err);
+
+  console.log("Response:", err.response);
+
+  console.log("Data:", err.response?.data);
+
+  console.log("Status:", err.response?.status);
+
+  setError(
+    err.response?.data?.detail ||
+    JSON.stringify(err.response?.data) ||
+    "Unable to update profile."
+  );
+}finally {
       setSaving(false);
     }
   }

@@ -31,7 +31,6 @@ export default function StatsCards() {
 
       setStats({
         jobs: jobs?.length || 0,
-        quotations: quotations?.length || 0,
         projects: projects?.length || 0,
         escrowHeld,
         released,
@@ -47,7 +46,6 @@ export default function StatsCards() {
 
   const cards = [
     { title: "Active Jobs", value: stats.jobs },
-    { title: "Quotations Received", value: stats.quotations },
     { title: "Active Projects", value: stats.projects },
     {
       title: "Escrow Held",
