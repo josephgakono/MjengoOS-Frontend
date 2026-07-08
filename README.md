@@ -198,8 +198,10 @@ python manage.py runserver
 ---
 # Links
 [Frontend Github Repository](https://github.com/josephgakono/MjengoOS-Frontend)
+<br>
 [Backend Github Repository](https://github.com/josephgakono/MjengoOS)
-[Vercel link]()
+<br>
+[Vercel link](https://mjengooswebapp.vercel.app/)
 
 # Project Goals
 
