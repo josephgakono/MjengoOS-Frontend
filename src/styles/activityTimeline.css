@@ -1,0 +1,28 @@
+/* Activity Timeline - scroll wrapper + scrollbar (match quotationSummary look) */
+
+.timeline-wrapper{
+  max-height:520px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding-right:4px;
+}
+
+
+.timeline-wrapper::-webkit-scrollbar{
+  width:10px;
+}
+
+.timeline-wrapper::-webkit-scrollbar-track{
+  background:#f1f5f9;
+  border-radius:20px;
+}
+
+.timeline-wrapper::-webkit-scrollbar-thumb{
+  background:#12121a;
+  border-radius:20px;
+}
+
+.timeline-wrapper::-webkit-scrollbar-thumb:hover{
+  background:#00b2ff;
+}
+
