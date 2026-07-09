@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { api } from "../../services/api"
+import "../../styles/activityTimeline.css"
 
 export default function ActivityTimeline() {
   const [activities, setActivities] = useState([])
@@ -10,6 +11,7 @@ export default function ActivityTimeline() {
         api.get("notifications/"),
         api.get("progress-updates/"),
         api.get("jobs/"),
+        
         api.get("quotations/"),
       ])
 
@@ -73,11 +75,11 @@ export default function ActivityTimeline() {
   }, [])
 
   return (
-    <div className="timeline">
+    <div className="timeline timeline-wrapper">
       {activities.length > 0 ? (
         activities.map((activity) => (
           <div key={activity.id} className="timeline-item">
-            <div className="timeline-dot"></div>
+
 
             <div className="timeline-content">
               <h4>{activity.title}</h4>
