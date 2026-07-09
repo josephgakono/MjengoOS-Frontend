@@ -7,7 +7,6 @@ import StatsCards from "../components/dashboard/StatsCards";
 import JobsTable from "../components/dashboard/JobsTable";
 import ActivityTimeline from "../components/dashboard/ActivityTimeline";
 import EscrowOverview from "../components/dashboard/EscrowOverview";
-import ProjectsChart from "../components/dashboard/ProjectsChart";
 import PostJobModal from "../components/Jobs/PostJobModal.jsx";
 import "../styles/dashboard.css";
 import QuotationsPage from "../components/customer/quotations/QuotationsPage";
@@ -15,6 +14,7 @@ import DashboardHeader from "../components/dashboard/DashboardHeader";
 import DashboardJobs from "../components/customer/DashboardJobs";
 import DashboardMessages from "../components/customer/DashboardMessages";
 import CustomerProjects from "../components/customer/CustomerProjects";
+import CustomerPayments from "../components/customer/CustomerPayments.jsx";
 
 function getStoredUser() {
   try {
@@ -103,10 +103,7 @@ export default function CustomerDashboard() {
                       <EscrowOverview />
                     </div>
 
-                    <div className="card">
-                      <h3>Projects At A Glance</h3>
-                      <ProjectsChart />
-                    </div>
+                    
                   </div>
                 </div>
 
@@ -173,6 +170,17 @@ export default function CustomerDashboard() {
               />
 
               <DashboardMessages />
+            </>
+          )}
+          {activeTab === "payments" && (
+            <>
+              <DashboardHeader
+                title="Payments"
+                subtitle="View payments you have made for particular projects."
+                setSidebarOpen={setSidebarOpen}
+              />
+
+              <CustomerPayments />
             </>
           )}
         </main>
