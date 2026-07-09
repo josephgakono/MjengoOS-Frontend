@@ -201,7 +201,7 @@ python manage.py runserver
 <br>
 [Backend Github Repository](https://github.com/josephgakono/MjengoOS)
 <br>
-[Vercel link](https://mjengooswebapp.vercel.app/)
+[Vercel link](https://mjengoos-frontend.vercel.app)
 
 # Project Goals
 
