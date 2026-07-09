@@ -10,6 +10,7 @@ import Contact from './pages/Contact'
 import WorkerDashboard from './pages/WorkerDashboard'
 import HowItWorks from './pages/HowItWorks'
 import Footer from './components/Footer'
+import About from './pages/About'
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/find-jobs" element={<Jobs/>}/>
         <Route path="/contact" element={<Contact/>}/>
         <Route path="/how-it-works" element={<HowItWorks/>}/>
+        <Route path="/about" element={<About/>}/>
         <Route path="/dashboard" element={<CustomerDashboard />} />
         <Route path="/worker-dashboard" element={<WorkerDashboard />} />
         <Route path="*" element={<Navigate to="/" replace />} />
