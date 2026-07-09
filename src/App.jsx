@@ -9,6 +9,7 @@ import Jobs from './pages/Jobs'
 import Contact from './pages/Contact'
 import WorkerDashboard from './pages/WorkerDashboard'
 import HowItWorks from './pages/HowItWorks'
+import Footer from './components/Footer'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/worker-dashboard" element={<WorkerDashboard />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Footer/>
     </>
   )
 }

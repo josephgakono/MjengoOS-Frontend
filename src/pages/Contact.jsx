@@ -134,7 +134,7 @@ export default function Contact() {
 
             <div className="social-links">
               <a href="#" aria-label="Facebook">
-                {/* lucide-react v1.21.0 does not include brand icon exports */}
+              
                 <span>f</span>
               </a>
 
