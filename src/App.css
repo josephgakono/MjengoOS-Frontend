@@ -3,7 +3,7 @@
   --mjengo-blue: #00b2ff;
   --mjengo-dark: #12121a;
   --mjengo-orange: #ff9a00;
-  --mjengo-light: #f5f5f7;
+  --mjengo-light: #3b3b43;
   --mjengo-purple: #634ce7;
   --mjengo-white: #ffffff;
   --mjengo-nav-black: #08080d;
@@ -598,6 +598,62 @@ body {
   font-weight: 600;
   line-height: 1.3;
 }
+
+/*  popup styles for the Home page “Post a Job” gate */
+
+.home-login-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 18, 26, 0.45);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.home-login-popup {
+  width: min(560px, 94vw);
+  padding: 26px 28px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 28px 90px rgba(18, 18, 26, 0.18);
+}
+
+.home-login-popup__title {
+  margin: 0 0 12px;
+  font-size: 1.5rem;
+  font-weight: 850;
+  color: var(--mjengo-dark);
+}
+
+.home-login-popup__text {
+  margin: 0 0 18px;
+  color: rgba(18, 18, 26, 0.68);
+  line-height: 1.7;
+}
+
+.home-login-popup__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.home-login-popup__close {
+  border: none;
+  background: var(--mjengo-blue);
+  color: #fff;
+  padding: 11px 22px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.home-login-popup__close:hover,
+.home-login-popup__close:focus-visible {
+  transform: translateY(-2px);
+}
+
 
 .home-hero__visual {
   position: relative;

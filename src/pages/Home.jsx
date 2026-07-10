@@ -1,4 +1,9 @@
 import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react';
+import PostJobModal from '../components/Jobs/PostJobModal.jsx';
+import { api } from '../services/api';
+
+
 
 const trustItems = [
   {
@@ -40,6 +45,38 @@ const workflowItems = [
 ]
 
 function Home() {
+  const [showPostJob, setShowPostJob] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [gatingLoading, setGatingLoading] = useState(false);
+
+  async function openPostJob() {
+    setGatingLoading(true);
+    setShowPopup(false);
+
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const token = localStorage.getItem("access");
+
+      if (!token || !user) {
+        setShowPopup(true);
+        return;
+      }
+
+      if (user.user_type !== "customer") {
+        setShowPopup(true);
+        return;
+      }
+
+      await api.get("customerprofile/");
+      setShowPostJob(true);
+    } catch (e) {
+      setShowPopup(true);
+    } finally {
+      setGatingLoading(false);
+    }
+  }
+
+
   return (
     <main className="home-page">
       <section className="home-hero" aria-labelledby="home-title">
@@ -56,9 +93,15 @@ function Home() {
           </p>
 
           <div className="home-hero__actions" aria-label="Primary actions">
-            <Link className="home-hero__button home-hero__button--primary" to="/post-job">
+<button
+              type="button"
+              className="home-hero__button home-hero__button--primary"
+              onClick={openPostJob}
+              disabled={gatingLoading}
+            >
               Post a Job
-            </Link>
+            </button>
+
             <Link className="home-hero__button home-hero__button--secondary" to="/find-jobs">
               Browse Jobs
             </Link>
@@ -118,6 +161,37 @@ function Home() {
           ))}
         </div>
       </section>
+
+      {showPopup && (
+        <div className="home-login-popup-overlay" onClick={() => setShowPopup(false)}>
+          <div
+            className="home-login-popup"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="home-login-popup__title">
+              Customer profile required
+            </h2>
+            <p className="home-login-popup__text">
+              You have to login with a customerprofile so as to post a job
+            </p>
+            <div className="home-login-popup__actions">
+              <button
+                className="home-login-popup__close"
+                type="button"
+                onClick={() => setShowPopup(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <PostJobModal
+        isOpen={showPostJob}
+        onClose={() => setShowPostJob(false)}
+        onJobCreated={() => window.location.reload()}
+      />
     </main>
   )
 }
