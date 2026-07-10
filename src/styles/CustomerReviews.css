@@ -196,8 +196,13 @@
     justify-content: center;
     align-items: center;
     padding: 20px;
-    z-index: 999;
+
+    /* Ensure modal floats above the fixed navbar */
+    z-index: 10050;
+    top: var(--navbar-height, 68px);
 }
+
+
 
 .modal-card {
     position: relative;
