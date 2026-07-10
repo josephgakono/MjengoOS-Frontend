@@ -15,6 +15,7 @@ import DashboardJobs from "../components/customer/DashboardJobs";
 import DashboardMessages from "../components/customer/DashboardMessages";
 import CustomerProjects from "../components/customer/CustomerProjects";
 import CustomerPayments from "../components/customer/CustomerPayments.jsx";
+import CustomerReviews from "../components/customer/CustomerReviews.jsx";
 
 function getStoredUser() {
   try {
@@ -170,6 +171,18 @@ export default function CustomerDashboard() {
               />
 
               <DashboardMessages />
+            </>
+          )}
+
+          {activeTab === "reviews" && (
+            <>
+              <DashboardHeader
+                title="Reviews"
+                subtitle="View reviews you have given and give reviews for completed projects"
+                setSidebarOpen={setSidebarOpen}
+              />
+
+              <CustomerReviews />
             </>
           )}
           {activeTab === "payments" && (
