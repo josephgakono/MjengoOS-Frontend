@@ -250,10 +250,6 @@ export default function WorkerProjects() {
             <p>Manage your assigned projects, upload progress updates.</p>
           </div>
 
-          <button className="post-job-btn" type="button" disabled>
-            <Plus size={18} />
-            Projects
-          </button>
         </div>
 
         <div className="messages-search" style={{ marginBottom: 18 }}>

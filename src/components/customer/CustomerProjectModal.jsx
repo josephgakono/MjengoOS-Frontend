@@ -122,12 +122,15 @@ export default function CustomerProjectModal({ open, project, onClose }) {
   if (loading) {
     return (
       <>
-        <div className="modal-overlay" onClick={onClose} />
+        <div className="project-modal-overlay" onClick={onClose} />
 
-        <div className="project-modal">Loading...</div>
+        <div className="project-modal" role="dialog" aria-modal="true">
+          Loading...
+        </div>
       </>
     );
   }
+
 
   //-------------------------------------------------------
   // JSX
@@ -140,17 +143,18 @@ export default function CustomerProjectModal({ open, project, onClose }) {
       <div className="project-modal">
         {/* Header */}
 
-        <div className="project-modal-header">
+      <div className="project-modal-header">
           <div>
             <h2>{job?.title}</h2>
 
             <p>{job?.location}</p>
           </div>
 
-          <button onClick={onClose}>
+          <button type="button" onClick={onClose}>
             <X size={22} />
           </button>
         </div>
+
 
         <div className="project-modal-body">
           {/* Job Details */}

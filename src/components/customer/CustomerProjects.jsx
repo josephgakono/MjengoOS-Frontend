@@ -8,28 +8,35 @@ import {
   MapPin,
   Calendar,
   ChevronRight,
+  X,
 } from "lucide-react";
 
 import { api } from "../../services/api";
-import CustomerProjectModal from "./CustomerProjectModal";
-
 import "../../styles/Jobs.css";
 
 export default function CustomerProjects() {
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+
+  const [loading, setLoading] = useState(true);
 
   const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [jobs, setJobs] = useState([]);
+  const [workers, setWorkers] = useState([]);
+  const [quotations, setQuotations] = useState([]);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
   const [selectedProject, setSelectedProject] = useState(null);
-  const [showModal, setShowModal] = useState(false);
 
+  const [showDetails, setShowDetails] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
 
-  //-------------------------------------------------
-  // Load Projects
-  //-------------------------------------------------
+  const [newProject, setNewProject] = useState({
+    job: "",
+    start_date: "",
+    expected_completion: "",
+  });
 
   useEffect(() => {
     loadProjects();
@@ -39,86 +46,54 @@ export default function CustomerProjects() {
     try {
       setLoading(true);
 
-      //-------------------------------------------------
-      // Logged in customer
-      //-------------------------------------------------
-
-      const currentUser = JSON.parse(localStorage.getItem("user"));
-
-      //-------------------------------------------------
-      // Load everything once
-      //-------------------------------------------------
-
-      const [projectsResponse, jobsResponse, workersResponse, usersResponse] =
+      const [projectsRes, jobsRes, workerRes, usersRes, quotationRes] =
         await Promise.all([
           api.get("projects/"),
           api.get("jobs/"),
           api.get("workerprofile/"),
           api.get("users/"),
+          api.get("quotations/"),
         ]);
 
-      const allProjects = Array.isArray(projectsResponse)
-        ? projectsResponse
-        : projectsResponse.results || [];
+      const projectList = projectsRes.results || projectsRes;
+      const jobList = jobsRes.results || jobsRes;
+      const workerProfiles = workerRes.results || workerRes;
+      const users = usersRes.results || usersRes;
+      const quotationList = quotationRes.results || quotationRes;
 
-      const jobs = Array.isArray(jobsResponse)
-        ? jobsResponse
-        : jobsResponse.results || [];
+      const myProjects = projectList
+        .filter((project) => {
+          const job = jobList.find((j) => j.id === project.job);
+          return Number(job?.customer) === Number(currentUser.id);
+        })
+        .map((project) => {
+          const job = jobList.find((j) => j.id === project.job);
 
-      const workerProfiles = Array.isArray(workersResponse)
-        ? workersResponse
-        : workersResponse.results || [];
+          const profile = workerProfiles.find(
+            (w) => Number(w.id) === Number(project.worker),
+          );
 
-      const users = Array.isArray(usersResponse)
-        ? usersResponse
-        : usersResponse.results || [];
+          const user = users.find(
+            (u) => Number(u.id) === Number(profile?.user),
+          );
 
-      //-------------------------------------------------
-      // Only projects that belong to this customer
-      //-------------------------------------------------
+          return {
+            ...project,
+            job,
+            workerInfo: user && {
+              username: user.username,
+              first_name: user.first_name,
+              last_name: user.last_name,
+              profession: profile?.profession,
+            },
+          };
+        })
+        .sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
 
-      const myProjects = allProjects.filter((project) => {
-        const job = jobs.find((j) => j.id === project.job);
-
-        return Number(job?.customer) === Number(currentUser.id);
-      });
-
-      //-------------------------------------------------
-      // Attach job + worker information
-      //-------------------------------------------------
-
-      const mapped = myProjects.map((project) => {
-        const job = jobs.find((j) => j.id === project.job);
-
-        const workerProfile = workerProfiles.find(
-          (w) => Number(w.id) === Number(project.worker),
-        );
-
-        const workerUser = users.find(
-          (u) => Number(u.id) === Number(workerProfile?.user),
-        );
-
-        return {
-          ...project,
-
-          job,
-
-          workerInfo: workerUser
-            ? {
-                id: workerUser.id,
-                username: workerUser.username,
-                first_name: workerUser.first_name,
-                last_name: workerUser.last_name,
-                profile_picture: workerUser.profile_picture || "",
-                profession: workerProfile?.profession || "",
-              }
-            : null,
-        };
-      });
-
-      mapped.sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
-
-      setProjects(mapped);
+      setProjects(myProjects);
+      setJobs(jobList);
+      setWorkers(workerProfiles);
+      setQuotations(quotationList);
     } catch (err) {
       console.error(err);
     } finally {
@@ -126,25 +101,14 @@ export default function CustomerProjects() {
     }
   }
 
-  //-------------------------------------------------
-  // Statistics
-  //-------------------------------------------------
-
-  const stats = useMemo(() => {
-    return {
-      total: projects.length,
-
+  const stats = useMemo(
+    () => ({
       active: projects.filter((p) => p.status !== "completed").length,
-
       completed: projects.filter((p) => p.status === "completed").length,
-
       released: projects.filter((p) => p.payment_received).length,
-    };
-  }, [projects]);
-
-  //-------------------------------------------------
-  // Search + Filter
-  //-------------------------------------------------
+    }),
+    [projects],
+  );
 
   const filteredProjects = useMemo(() => {
     let list = [...projects];
@@ -156,63 +120,90 @@ export default function CustomerProjects() {
     if (search.trim()) {
       const value = search.toLowerCase();
 
-      list = list.filter((project) => {
-        return (
+      list = list.filter(
+        (project) =>
           project.job?.title?.toLowerCase().includes(value) ||
           project.job?.location?.toLowerCase().includes(value) ||
-          project.workerInfo?.username?.toLowerCase().includes(value)
-        );
-      });
+          project.workerInfo?.username?.toLowerCase().includes(value),
+      );
     }
 
     return list;
   }, [projects, search, statusFilter]);
 
-  //-------------------------------------------------
-  // Helpers
-  //-------------------------------------------------
+  const activeProjects = filteredProjects.filter((p) => p.status !== "completed");
+  const completedProjects = filteredProjects.filter(
+    (p) => p.status === "completed",
+  );
+
+  const availableJobs = jobs.filter((job) => {
+    const alreadyExists = projects.some((p) => p.job.id === job.id);
+
+    const accepted = quotations.find(
+      (q) => q.job === job.id && q.status === "accepted",
+    );
+
+    return (
+      Number(job.customer) === Number(currentUser.id) &&
+      accepted &&
+      !alreadyExists
+    );
+  });
+
+  const selectedQuotation = quotations.find(
+    (q) => q.job === Number(newProject.job) && q.status === "accepted",
+  );
 
   function openProject(project) {
     setSelectedProject(project);
-    setShowModal(true);
+    setShowDetails(true);
   }
 
   function formatDate(date) {
-    if (!date) return "--";
-
-    return new Date(date).toLocaleDateString();
+    return date ? new Date(date).toLocaleDateString() : "--";
   }
 
-  //-------------------------------------------------
-  // Loading
-  //-------------------------------------------------
+  async function createProject(e) {
+    e.preventDefault();
+
+    try {
+      await api.post("projects/", {
+        job: Number(newProject.job),
+        worker: selectedQuotation.worker,
+        start_date: newProject.start_date,
+        expected_completion: newProject.expected_completion,
+        status: "pending",
+      });
+
+      setShowCreate(false);
+
+      setNewProject({
+        job: "",
+        start_date: "",
+        expected_completion: "",
+      });
+
+      loadProjects();
+    } catch (err) {
+      alert(err.data?.detail || err.message);
+    }
+  }
 
   if (loading) {
     return <div className="jobs-loading">Loading projects...</div>;
   }
-
-  //-------------------------------------------------
-  // Split lists
-  //-------------------------------------------------
-
-  const activeProjects = filteredProjects.filter((p) => p.status !== "completed");
-  const completedProjects = filteredProjects.filter((p) => p.status === "completed");
-
-  //-------------------------------------------------
-  // Project Card (Jobs look)
-  //-------------------------------------------------
 
   function ProjectCard({ project, completed }) {
     return (
       <button className="job-item" onClick={() => openProject(project)}>
         <div className="job-item-top">
           <div>
-            <h4>{project.job?.title || "Untitled Project"}</h4>
+            <h4>{project.job?.title}</h4>
 
             <div className="job-meta">
               <span>
                 <MapPin size={14} />
-                {project.job?.location || "Location not provided"}
+                {project.job?.location}
               </span>
 
               <span>
@@ -236,17 +227,13 @@ export default function CustomerProjects() {
     );
   }
 
-  //-------------------------------------------------
-  // JSX
-  //-------------------------------------------------
-
   return (
     <>
       <div className="jobs-summary">
         <div className="summary-card blue">
           <div>
             <span>Active Projects</span>
-            <h2>{activeProjects.length}</h2>
+            <h2>{stats.active}</h2>
           </div>
 
           <Briefcase size={34} />
@@ -255,7 +242,7 @@ export default function CustomerProjects() {
         <div className="summary-card purple">
           <div>
             <span>Completed Projects</span>
-            <h2>{completedProjects.length}</h2>
+            <h2>{stats.completed}</h2>
           </div>
 
           <CheckCircle2 size={34} />
@@ -275,20 +262,19 @@ export default function CustomerProjects() {
         <div className="jobs-header">
           <div>
             <h2>My Projects</h2>
-            <p>Manage your created projects and track progress.</p>
+            <p>Track and manage every construction project.</p>
           </div>
 
-          <button className="post-job-btn" type="button" disabled>
+          <button className="post-job-btn" onClick={() => setShowCreate(true)}>
             <Plus size={18} />
-            Projects
+            Create Project
           </button>
         </div>
 
-        {/* Search + Filter */}
         <div className="messages-search" style={{ marginBottom: 18 }}>
           <Search size={18} />
+
           <input
-            type="text"
             placeholder="Search projects..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -297,10 +283,15 @@ export default function CustomerProjects() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            style={{ padding: "10px 14px", borderRadius: 12 }}
+            style={{
+              padding: "10px 14px",
+              borderRadius: 12,
+            }}
           >
             <option value="all">All</option>
-            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="in_progress">In Progress</option>
+            <option value="paused">Paused</option>
             <option value="completed">Completed</option>
           </select>
         </div>
@@ -313,14 +304,14 @@ export default function CustomerProjects() {
             </div>
 
             <div className="jobs-scroll">
-              {activeProjects.length > 0 ? (
+              {activeProjects.length ? (
                 activeProjects.map((project) => (
                   <ProjectCard key={project.id} project={project} />
                 ))
               ) : (
                 <div className="empty-state">
-                  <Briefcase size={44} />
-                  <p>No active projects found.</p>
+                  <Briefcase size={42} />
+                  <p>No active projects.</p>
                 </div>
               )}
             </div>
@@ -333,14 +324,18 @@ export default function CustomerProjects() {
             </div>
 
             <div className="jobs-scroll">
-              {completedProjects.length > 0 ? (
+              {completedProjects.length ? (
                 completedProjects.map((project) => (
-                  <ProjectCard key={project.id} project={project} completed />
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    completed
+                  />
                 ))
               ) : (
                 <div className="empty-state">
-                  <CheckCircle2 size={44} />
-                  <p>No completed projects yet.</p>
+                  <CheckCircle2 size={42} />
+                  <p>No completed projects.</p>
                 </div>
               )}
             </div>
@@ -348,15 +343,180 @@ export default function CustomerProjects() {
         </div>
       </div>
 
-      <CustomerProjectModal
-        open={showModal && selectedProject}
-        project={selectedProject}
-        onClose={() => {
-          setShowModal(false);
-          setSelectedProject(null);
-          loadProjects();
-        }}
-      />
+      {/* Project Details */}
+      {showDetails && selectedProject && (
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <button
+              className="close-btn"
+              onClick={() => {
+                setShowDetails(false);
+                setSelectedProject(null);
+              }}
+            >
+              <X size={18} />
+            </button>
+
+            <h2>{selectedProject.job?.title}</h2>
+
+            <div className="details-scroll">
+              <div className="details-grid">
+                <div>
+                  <strong>Location</strong>
+                  <span>{selectedProject.job?.location}</span>
+                </div>
+
+                <div>
+                  <strong>Budget</strong>
+                  <span>KES {selectedProject.job?.budget}</span>
+                </div>
+
+                <div>
+                  <strong>Status</strong>
+                  <span>{selectedProject.status}</span>
+                </div>
+
+                <div>
+                  <strong>Worker</strong>
+                  <span>
+                    {selectedProject.workerInfo?.first_name}{" "}
+                    {selectedProject.workerInfo?.last_name}
+                  </span>
+                </div>
+
+                <div>
+                  <strong>Username</strong>
+                  <span>@{selectedProject.workerInfo?.username}</span>
+                </div>
+
+                <div>
+                  <strong>Profession</strong>
+                  <span>{selectedProject.workerInfo?.profession}</span>
+                </div>
+
+                <div>
+                  <strong>Start Date</strong>
+                  <span>{formatDate(selectedProject.start_date)}</span>
+                </div>
+
+                <div>
+                  <strong>Expected Completion</strong>
+                  <span>
+                    {formatDate(selectedProject.expected_completion)}
+                  </span>
+                </div>
+
+                <div>
+                  <strong>Actual Completion</strong>
+                  <span>{formatDate(selectedProject.actual_completion)}</span>
+                </div>
+
+                <div>
+                  <strong>Payment Released</strong>
+                  <span>{selectedProject.payment_received ? "Yes" : "No"}</span>
+                </div>
+
+                <div className="full-width">
+                  <strong>Description</strong>
+                  <p>{selectedProject.job?.description}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Project */}
+      {showCreate && (
+        <div className="modal-overlay">
+          <form className="modal-card" onSubmit={createProject}>
+            <button
+              type="button"
+              className="close-btn"
+              onClick={() => setShowCreate(false)}
+            >
+              <X size={18} />
+            </button>
+
+            <h2>Create Project</h2>
+
+            <label>
+              Accepted Job
+              <select
+                required
+                value={newProject.job}
+                onChange={(e) =>
+                  setNewProject({
+                    ...newProject,
+                    job: e.target.value,
+                  })
+                }
+              >
+                <option value="">Select Job</option>
+
+                {availableJobs.map((job) => (
+                  <option key={job.id} value={job.id}>
+                    {job.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Start Date
+              <input
+                type="date"
+                required
+                value={newProject.start_date}
+                onChange={(e) =>
+                  setNewProject({
+                    ...newProject,
+                    start_date: e.target.value,
+                  })
+                }
+              />
+            </label>
+
+            <label>
+              Expected Completion
+              <input
+                type="date"
+                required
+                value={newProject.expected_completion}
+                onChange={(e) =>
+                  setNewProject({
+                    ...newProject,
+                    expected_completion: e.target.value,
+                  })
+                }
+              />
+            </label>
+
+            {selectedQuotation && (
+              <div
+                style={{
+                  background: "#f5f7fb",
+                  padding: 14,
+                  borderRadius: 12,
+                  marginBottom: 18,
+                }}
+              >
+                <strong>Assigned Worker</strong>
+
+                <p>Worker ID: {selectedQuotation.worker}</p>
+
+                <p>Quotation Amount: KES {selectedQuotation.amount}</p>
+
+                <p>Estimated Days: {selectedQuotation.estimated_days}</p>
+              </div>
+            )}
+
+            <button className="post-job-btn" type="submit">
+              Create Project
+            </button>
+          </form>
+        </div>
+      )}
     </>
   );
 }
