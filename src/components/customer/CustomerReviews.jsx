@@ -257,9 +257,19 @@ export default function CustomerReviews() {
       {/* View Review */}
 
       {selected && (
-        <div className="review-modal">
-          <div className="modal-card">
-            <button className="close-btn" onClick={() => setSelected(null)}>
+        <div className="customer-review-modal" onClick={() => setSelected(null)}>
+          <div
+            className="customer-review-card"
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="customer-review-close"
+              onClick={() => setSelected(null)}
+              type="button"
+              aria-label="Close review details"
+            >
               <X size={18} />
             </button>
 
@@ -273,7 +283,7 @@ export default function CustomerReviews() {
                 <>
                   <h2>Review Details</h2>
 
-                  <div className="details-grid">
+                  <div className="customer-review-details">
                     <div>
                       <strong>Worker</strong>
                       <span>{worker?.full_name}</span>
@@ -296,7 +306,9 @@ export default function CustomerReviews() {
 
                     <div>
                       <strong>Rating</strong>
-                      <span>{"★".repeat(selected.rating)}</span>
+                      <span className="customer-review-rating">
+                        {selected.rating} / 5
+                      </span>
                     </div>
 
                     <div>
@@ -304,7 +316,7 @@ export default function CustomerReviews() {
                       <span>{selected.created_at}</span>
                     </div>
 
-                    <div className="full-width">
+                    <div className="customer-review-comment">
                       <strong>Comment</strong>
 
                       <p>{selected.comment}</p>
@@ -320,12 +332,22 @@ export default function CustomerReviews() {
       {/* Leave Review */}
 
       {reviewProject && (
-        <div className="review-modal">
-          <form className="modal-card" onSubmit={submitReview}>
+        <div
+          className="customer-review-modal"
+          onClick={() => setReviewProject(null)}
+        >
+          <form
+            className="customer-review-card customer-review-form"
+            onSubmit={submitReview}
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               type="button"
-              className="close-btn"
+              className="customer-review-close"
               onClick={() => setReviewProject(null)}
+              aria-label="Close leave review form"
             >
               <X size={18} />
             </button>

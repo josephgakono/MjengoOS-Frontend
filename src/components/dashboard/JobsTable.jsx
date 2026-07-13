@@ -52,7 +52,6 @@ export default function JobsTable() {
             <th>Location</th>
             <th>Budget</th>
             <th>Status</th>
-            <th>Date</th>
           </tr>
         </thead>
 
@@ -68,7 +67,7 @@ export default function JobsTable() {
                   <span className={statusClass(job.status)}>{job.status}</span>
                 </td>
 
-                <td>{job.created_at}</td>
+              
               </tr>
             ))
           ) : (

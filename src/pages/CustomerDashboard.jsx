@@ -6,7 +6,6 @@ import Sidebar from "../components/dashboard/Sidebar";
 import StatsCards from "../components/dashboard/StatsCards";
 import JobsTable from "../components/dashboard/JobsTable";
 import ActivityTimeline from "../components/dashboard/ActivityTimeline";
-import EscrowOverview from "../components/dashboard/EscrowOverview";
 import PostJobModal from "../components/Jobs/PostJobModal.jsx";
 import "../styles/dashboard.css";
 import QuotationsPage from "../components/customer/quotations/QuotationsPage";
@@ -97,15 +96,6 @@ export default function CustomerDashboard() {
 
                     <JobsTable />
                   </div>
-
-                  <div className="bottom-grid">
-                    <div className="card">
-                      <h3>Escrow Overview</h3>
-                      <EscrowOverview />
-                    </div>
-
-                    
-                  </div>
                 </div>
 
                 <div className="content-right">
@@ -147,7 +137,7 @@ export default function CustomerDashboard() {
                 subtitle="View and manage your created projects."
                 setSidebarOpen={setSidebarOpen}
               />
-              <CustomerProjects/>
+              <CustomerProjects />
             </>
           )}
 

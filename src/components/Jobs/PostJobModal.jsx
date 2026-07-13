@@ -41,8 +41,8 @@ export default function PostJobModal({ isOpen, onClose, onJobCreated }) {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="job-modal">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="job-modal post-job-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div>
             <h2>Post New Job</h2>

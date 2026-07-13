@@ -137,10 +137,13 @@ export default function CustomerProjectModal({ open, project, onClose }) {
   //-------------------------------------------------------
 
   return (
-    <>
-      <div className="modal-overlay" onClick={onClose} />
-
-      <div className="project-modal">
+    <div className="project-modal-overlay" onClick={onClose}>
+      <div
+        className="project-modal"
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
 
       <div className="project-modal-header">
@@ -439,6 +442,6 @@ export default function CustomerProjectModal({ open, project, onClose }) {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
