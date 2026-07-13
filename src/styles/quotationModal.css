@@ -427,12 +427,21 @@
 ========================================================= */
 
 .quote-modal::-webkit-scrollbar{
-    width:8px;
+    width:10px;
+}
+
+.quote-modal::-webkit-scrollbar-track{
+    background:#f1f5f9;
+    border-radius:20px;
 }
 
 .quote-modal::-webkit-scrollbar-thumb{
-    background:#cbd5e1;
+    background:#12121a;
     border-radius:20px;
+}
+
+.quote-modal::-webkit-scrollbar-thumb:hover{
+    background:#00b2ff;
 }
 
 /* =========================================================
@@ -636,4 +645,105 @@
 
 .stk-pay-btn:hover{
     transform:translateY(-2px);
+}
+
+/* =========================================================
+   MODAL PRESENTATION REFINEMENTS
+========================================================= */
+
+.quote-modal-overlay,
+.stk-overlay{
+    background:rgba(18,18,26,.62);
+    backdrop-filter:blur(6px);
+    padding:20px;
+}
+
+.quote-modal,
+.stk-modal{
+    background:#fff;
+    color:#12121a;
+    border-radius:22px;
+    box-shadow:0 30px 80px rgba(0,0,0,.24);
+}
+
+.quote-modal{
+    width:min(1100px,94vw);
+    padding:30px;
+}
+
+.quote-modal-header{
+    padding-bottom:22px;
+    border-bottom:1px solid #eceef2;
+}
+
+.quote-modal-header h2{
+    margin:0;
+    line-height:1.2;
+}
+
+.quote-modal-header p{
+    line-height:1.55;
+}
+
+.quote-modal .worker-card,
+.quote-modal .job-card,
+.quote-modal .quotation-summary-card{
+    border-color:#e7edf3;
+    border-radius:18px;
+    box-shadow:0 8px 22px rgba(15,23,42,.04);
+}
+
+.quote-modal .worker-stat,
+.quote-modal .summary-item,
+.quote-modal .quotation-message{
+    background:#f8fafc;
+    color:#475569;
+}
+
+.quote-modal .job-description{
+    padding:0;
+    border-top:0;
+}
+
+.quote-modal .job-description p,
+.quote-modal .quotation-message p,
+.quote-modal .budget-card p,
+.quote-modal .quotation-finished p{
+    color:#475569;
+    line-height:1.75;
+}
+
+.quote-modal strong,
+.quote-modal h3,
+.quote-modal h4{
+    color:#12121a;
+}
+
+.close-modal-btn,
+.stk-close{
+    color:#12121a;
+}
+
+.close-modal-btn:hover,
+.stk-close:hover{
+    background:#ef4444;
+    color:#fff;
+}
+
+.close-modal-btn:hover svg{
+    color:#fff;
+}
+
+@media(max-width:768px){
+    .quote-modal-overlay{
+        padding:0;
+    }
+
+    .quote-modal{
+        width:100vw;
+        height:100vh;
+        max-height:100vh;
+        border-radius:0;
+        padding:22px;
+    }
 }

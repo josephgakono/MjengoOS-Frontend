@@ -24,17 +24,7 @@ OVERLAY
   margin:0;
 }
 
-.job-modal-overlay{
-position:fixed;
-inset:0;
-background:rgba(18,18,26,.45);
-backdrop-filter:blur(5px);
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:999;
-animation:fadeOverlay .25s ease;
-}
+
 
 /*====================================================
 MODAL
@@ -53,19 +43,26 @@ border-radius:18px;
 box-shadow:0 28px 90px rgba(18,18,26,.18);
 z-index:1000;
 animation:modalIn .28s ease;
+scrollbar-width:thin;
+scrollbar-color:#12121a #f1f5f9;
 }
 
 .job-modal::-webkit-scrollbar{
-width:8px;
+width:10px;
+}
+
+.job-modal::-webkit-scrollbar-track{
+background:#f1f5f9;
+border-radius:20px;
 }
 
 .job-modal::-webkit-scrollbar-thumb{
-background:#d4d9df;
+background:#12121a;
 border-radius:20px;
 }
 
 .job-modal::-webkit-scrollbar-thumb:hover{
-background:var(--mjengo-blue);
+background:#00b2ff;
 }
 
 /*====================================================
@@ -530,4 +527,313 @@ font-size:.9rem;
 height:190px;
 }
 
+}
+
+/*====================================================
+SHARED JOB MODAL POLISH
+====================================================*/
+
+.job-modal-overlay{
+position:fixed;
+inset:0;
+background:rgba(18,18,26,.62);
+backdrop-filter:blur(6px);
+z-index:999;
+animation:fadeOverlay .25s ease;
+}
+
+.post-job-modal{
+width:min(620px,94vw);
+padding:28px;
+}
+
+.post-job-modal .modal-header{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+gap:18px;
+margin-bottom:24px;
+}
+
+.post-job-modal .modal-header h2{
+margin:0;
+color:#12121a;
+font-size:1.7rem;
+font-weight:700;
+line-height:1.2;
+}
+
+.post-job-modal .modal-header p{
+margin:6px 0 0;
+color:#64748b;
+font-size:.95rem;
+line-height:1.55;
+}
+
+.post-job-modal .form-group{
+margin-bottom:18px;
+}
+
+.post-job-modal .form-group label{
+display:block;
+margin-bottom:8px;
+font-weight:600;
+color:#12121a;
+}
+
+.post-job-modal .form-group input,
+.post-job-modal .form-group textarea{
+width:100%;
+padding:14px 16px;
+border:1px solid #dbe2ea;
+border-radius:14px;
+background:#fff;
+color:#12121a;
+font:inherit;
+}
+
+.post-job-modal .form-group input::placeholder,
+.post-job-modal .form-group textarea::placeholder{
+color:#7d8794;
+}
+
+.post-job-modal .form-group input:focus,
+.post-job-modal .form-group textarea:focus{
+outline:none;
+border-color:var(--mjengo-blue);
+box-shadow:0 0 0 4px rgba(0,178,255,.14);
+}
+
+.post-job-modal .modal-actions{
+display:flex;
+justify-content:flex-end;
+gap:14px;
+margin-top:28px;
+}
+
+.job-modal .close-btn,
+.job-modal-close{
+flex:0 0 auto;
+}
+
+.job-header{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+gap:18px;
+padding:38px 45px 28px;
+border-bottom:1px solid #eceef2;
+}
+
+.job-header h2{
+margin:0;
+font-size:2rem;
+font-weight:700;
+line-height:1.25;
+color:var(--mjengo-dark);
+padding-right:44px;
+}
+
+.job-header span{
+display:inline-flex;
+align-items:center;
+padding:7px 14px;
+border-radius:999px;
+background:#eef6ff;
+color:var(--mjengo-blue);
+font-size:.82rem;
+font-weight:700;
+white-space:nowrap;
+}
+
+.job-details{
+padding:18px 45px;
+display:flex;
+flex-direction:column;
+}
+
+.job-row{
+display:grid;
+grid-template-columns:46px 150px minmax(0,1fr);
+align-items:center;
+gap:0;
+padding:18px 0;
+border-bottom:1px solid #f0f2f5;
+}
+
+.job-row:last-child{
+border-bottom:0;
+}
+
+.job-row-icon{
+width:36px;
+height:36px;
+display:flex;
+justify-content:center;
+align-items:center;
+border-radius:10px;
+background:rgba(0,178,255,.08);
+color:var(--mjengo-blue);
+}
+
+.job-row-label{
+font-size:.9rem;
+font-weight:600;
+color:#7d8794;
+}
+
+.job-row-value{
+min-width:0;
+font-size:.98rem;
+font-weight:600;
+color:var(--mjengo-dark);
+word-break:break-word;
+}
+
+.job-section{
+padding:30px 45px;
+border-top:1px solid #eceef2;
+}
+
+.job-section:nth-of-type(even){
+background:#fafbfd;
+}
+
+.section-title,
+.section-header{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:18px;
+}
+
+.section-title{
+font-size:1.05rem;
+font-weight:700;
+color:var(--mjengo-dark);
+}
+
+.section-title svg{
+color:var(--mjengo-blue);
+}
+
+.section-header{
+justify-content:space-between;
+}
+
+.section-header h3{
+margin:0;
+font-size:1.1rem;
+font-weight:700;
+color:var(--mjengo-dark);
+}
+
+.section-header span{
+width:34px;
+height:34px;
+display:flex;
+justify-content:center;
+align-items:center;
+background:var(--mjengo-blue);
+color:#fff;
+border-radius:50%;
+font-size:.82rem;
+font-weight:700;
+}
+
+.job-section > .job-description{
+padding:0;
+border-top:0;
+margin:0;
+line-height:1.9;
+font-size:.95rem;
+color:#59616d;
+white-space:pre-wrap;
+}
+
+.progress-item{
+background:#fff;
+border:1px solid #e9edf2;
+border-radius:14px;
+padding:22px;
+margin-bottom:18px;
+box-shadow:0 8px 22px rgba(18,18,26,.04);
+}
+
+.progress-top{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+margin-bottom:12px;
+}
+
+.progress-top h4{
+margin:0 0 4px;
+font-size:1rem;
+font-weight:700;
+color:var(--mjengo-dark);
+}
+
+.progress-top span{
+font-size:.83rem;
+color:var(--mjengo-text-soft);
+}
+
+.progress-description{
+margin:0;
+font-size:.95rem;
+line-height:1.75;
+color:#555f6d;
+white-space:pre-wrap;
+}
+
+@media(max-width:640px){
+.post-job-modal{
+width:100vw;
+height:100vh;
+max-height:100vh;
+border-radius:0;
+padding:22px;
+}
+
+.post-job-modal .modal-header h2{
+font-size:1.4rem;
+}
+
+.post-job-modal .modal-actions{
+flex-direction:column-reverse;
+}
+
+.post-job-modal .cancel-btn,
+.post-job-modal .submit-job-btn{
+width:100%;
+}
+
+.job-header{
+padding:28px 20px 20px;
+}
+
+.job-header{
+flex-direction:column;
+}
+
+.job-header h2{
+font-size:1.45rem;
+padding-right:45px;
+}
+
+.job-details,
+.job-section{
+padding:20px;
+}
+
+.job-row{
+grid-template-columns:36px 1fr;
+row-gap:6px;
+align-items:flex-start;
+}
+
+.job-row-value{
+grid-column:2;
+}
 }

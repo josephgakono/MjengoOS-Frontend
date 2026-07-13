@@ -36,6 +36,14 @@ SUMMARY CARDS
   margin-bottom: 20px;
 }
 
+/* Match WorkerJobs card look: remove unnecessary colors from summary icons */
+.summary-card svg {
+  opacity: .9;
+  background: transparent !important;
+  color: #111827;
+}
+
+
 .summary-card:hover {
   transform: translateY(-4px);
 }
@@ -56,16 +64,17 @@ SUMMARY CARDS
 }
 
 .summary-card.blue {
-  background: var(--mjengo-blue);
+  background:#fff !important;
 }
 
 .summary-card.purple {
-  background:var(--mjengo-purple);
+  background:#fff !important;
 }
 
 .summary-card.orange {
-  background:var(--mjengo-orange);
+  background:#fff !important;
 }
+
 
 /*==================================================
 MAIN CONTAINER
@@ -175,19 +184,26 @@ SCROLL AREA
   display: flex;
   flex-direction: column;
   gap: 14px;
+  scrollbar-width: thin;
+  scrollbar-color: #12121a #f1f5f9;
 }
 
 .jobs-scroll::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 .jobs-scroll::-webkit-scrollbar-thumb {
-  background: var(--mjengo-blue);
+  background: #12121a;
   border-radius: 20px;
 }
 
 .jobs-scroll::-webkit-scrollbar-track {
-  background: transparent;
+  background: #f1f5f9;
+  border-radius: 20px;
+}
+
+.jobs-scroll::-webkit-scrollbar-thumb:hover {
+  background: #00b2ff;
 }
 
 /*==================================================
@@ -437,19 +453,26 @@ padding:16px;
   max-height: 56vh;
   overflow-y: auto;
   padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #12121a #f1f5f9;
 }
 
 .details-scroll::-webkit-scrollbar{
-  width: 8px;
+  width: 10px;
 }
 
 .details-scroll::-webkit-scrollbar-thumb{
-  background: var(--mjengo-blue);
+  background: #12121a;
   border-radius: 20px;
 }
 
 .details-scroll::-webkit-scrollbar-track{
-  background: transparent;
+  background: #f1f5f9;
+  border-radius: 20px;
+}
+
+.details-scroll::-webkit-scrollbar-thumb:hover{
+  background: #00b2ff;
 }
 
 

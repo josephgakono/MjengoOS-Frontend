@@ -50,14 +50,16 @@
     box-shadow: 0 18px 40px rgba(0, 0, 0, .08);
 }
 
+/* Match WorkerJobs: remove unnecessary icon background colors/gradients */
 .summary-card svg {
     width: 55px;
     height: 55px;
     padding: 14px;
     border-radius: 16px;
-    background:#634ce7;
-    color: #fff;
+    background: #fff;
+    color: #634ce7;
 }
+
 
 .summary-card span {
     display: block;
@@ -72,19 +74,14 @@
     font-weight: 700;
 }
 
-/* Card Variants */
+/* Card Variants (removed gradients) */
 
-.summary-card.accepted svg {
-    background: linear-gradient(135deg,#16a34a,#22c55e);
-}
-
-.summary-card.pending svg {
-    background: linear-gradient(135deg,#f59e0b,#fbbf24);
-}
-
+.summary-card.accepted svg,
+.summary-card.pending svg,
 .summary-card.rejected svg {
-    background: linear-gradient(135deg,#dc2626,#ef4444);
+    background: transparent;
 }
+
 
 /* =========================================================
    TABLE
@@ -260,3 +257,4 @@
     }
 
 }
+

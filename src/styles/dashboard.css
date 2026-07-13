@@ -376,7 +376,7 @@ a{
 
     border-radius:14px;
 
-    background:var(--mjengo-purple);
+    background:var(--mjengo-blue);
 
     color:white;
 
@@ -445,37 +445,7 @@ a{
     line-height:1.6;
 }
 
-/* ======================================================
-   USER CARD
-====================================================== */
 
-.header-user{
-    display:flex;
-    align-items:center;
-    gap:14px;
-
-    background:#fff;
-    padding:10px 16px;
-    border-radius:18px;
-
-    box-shadow:0 10px 30px rgba(0,0,0,.06);
-}
-
-.header-user img{
-    width:52px;
-    height:52px;
-    border-radius:50%;
-}
-
-.header-user h4{
-    font-size:15px;
-    color:#12121a;
-}
-
-.header-user span{
-    font-size:13px;
-    color:#64748b;
-}
 
 /* ======================================================
    STATISTICS GRID
@@ -494,7 +464,7 @@ a{
 
     border-radius:20px;
 
-    padding:22px;
+    padding:15px;
 
     box-shadow:
         0 5px 20px rgba(0,0,0,.04);
@@ -507,13 +477,11 @@ a{
 }
 
 .stat-card h4{
-    font-size:.9rem;
     color:#64748b;
     margin-bottom:14px;
 }
 
 .stat-card h2{
-    font-size:2rem;
     color:#111827;
     margin-bottom:10px;
 }
@@ -550,7 +518,7 @@ a{
     background:#fff;
     border:1px solid #e2e8f0;
     border-radius:12px;
-    padding:22px;
+    padding:10px;
     box-shadow:none;
     overflow:hidden;
     transition:.25s;
@@ -568,7 +536,7 @@ a{
     background:#fff;
     border:1px solid #e2e8f0;
     border-radius:12px;
-    padding:18px;
+    padding:10px;
     box-shadow:none;
     overflow:hidden;
 }
@@ -603,7 +571,7 @@ a{
 
     flex-wrap:wrap;
 
-    margin-bottom:20px;
+    margin-bottom:10px;
 }
 
 .card-header h3{
@@ -618,7 +586,7 @@ a{
 .primary-btn{
     border:none;
 
-    background:#634ce7;
+    background:var(--mjengo-blue);
 
     color:#fff;
 
@@ -626,7 +594,6 @@ a{
 
     border-radius:14px;
 
-    font-weight:600;
 
     cursor:pointer;
 
@@ -634,7 +601,6 @@ a{
 }
 
 .primary-btn:hover{
-    background:#4f39d9;
     transform:translateY(-2px);
 }
 
@@ -690,9 +656,32 @@ a{
    TABLES
 ====================================================== */
 
-.table-wrapper{
-    width:100%;
-    overflow-x:auto;
+.table-wrapper {
+  max-height: 520px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0;
+  scrollbar-width: thin; 
+  scrollbar-color: #12121a #f1f5f9; 
+}
+
+
+.table-wrapper::-webkit-scrollbar {
+  width: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 20px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #12121a;
+  border-radius: 20px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #00b2ff;
 }
 
 .dashboard-table{
@@ -805,35 +794,7 @@ a{
     color:#94a3b8;
 }
 
-/* ======================================================
-   ESCROW
-====================================================== */
 
-.escrow-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-    gap:18px;
-}
-
-.escrow-card{
-    border:1px solid #e5e7eb;
-    border-radius:18px;
-    padding:20px;
-}
-
-.escrow-card h5{
-    color:#64748b;
-    margin-bottom:10px;
-}
-
-.escrow-card h2{
-    margin-bottom:8px;
-}
-
-.escrow-card span{
-    color:#94a3b8;
-    font-size:.9rem;
-}
 
 /* ======================================================
    CHART
@@ -891,6 +852,8 @@ a{
     box-shadow:0 30px 80px rgba(0,0,0,.28);
 
     animation:modalIn .25s ease;
+    scrollbar-width:thin;
+    scrollbar-color:#12121a #f1f5f9;
 }
 
 
@@ -898,16 +861,21 @@ a{
 /* Scrollbar */
 
 .job-modal::-webkit-scrollbar{
-    width:8px;
+    width:10px;
 }
 
 .job-modal::-webkit-scrollbar-thumb{
-    background:#cbd5e1;
+    background:#12121a;
     border-radius:20px;
 }
 
 .job-modal::-webkit-scrollbar-track{
-    background:transparent;
+    background:#f1f5f9;
+    border-radius:20px;
+}
+
+.job-modal::-webkit-scrollbar-thumb:hover{
+    background:#00b2ff;
 }
 
 /* ==========================================================
@@ -1072,9 +1040,9 @@ a{
 
     border-radius:14px;
 
-    background:#1685e0;
+    background:#f1f5f9;
 
-    color:#12121a;
+    color:#334155;
 
     font-weight:600;
 
@@ -1085,7 +1053,9 @@ a{
 
 .cancel-btn:hover{
 
-    background:#35023d;
+    background:#e2e8f0;
+
+    color:#12121a;
 }
 
 /* Submit */
@@ -1098,7 +1068,7 @@ a{
 
     border-radius:14px;
 
-    background:linear-gradient(135deg,#00b2ff,#634ce7);
+    background:#00b2ff;
 
     color:#fff;
 

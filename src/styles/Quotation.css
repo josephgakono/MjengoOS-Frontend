@@ -132,21 +132,44 @@
 .quotation-overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.45);
+  background:rgba(18,18,26,.62);
+  backdrop-filter:blur(6px);
   display:flex;
   align-items:center;
   justify-content:center;
   padding:20px;
-  z-index:1000;
+  z-index:5000;
 }
 
 .quotation-modal{
-  width:min(700px,100%);
-  max-height:90vh;
+  width:min(760px,94vw);
+  max-height:92vh;
   overflow-y:auto;
   background:#fff;
-  border-radius:12px;
+  color:#12121a;
+  border-radius:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.24);
   animation:popup .2s ease;
+  scrollbar-width:thin;
+  scrollbar-color:#12121a #f1f5f9;
+}
+
+.quotation-modal::-webkit-scrollbar{
+  width:10px;
+}
+
+.quotation-modal::-webkit-scrollbar-track{
+  background:#f1f5f9;
+  border-radius:20px;
+}
+
+.quotation-modal::-webkit-scrollbar-thumb{
+  background:#12121a;
+  border-radius:20px;
+}
+
+.quotation-modal::-webkit-scrollbar-thumb:hover{
+  background:#00b2ff;
 }
 
 @keyframes popup{
@@ -167,24 +190,42 @@ transform:none;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:16px 20px;
-  border-bottom:1px solid #e5e7eb;
+  padding:24px 28px;
+  border-bottom:1px solid #eceef2;
+  background:#fff;
 }
 
 .quotation-modal-header h2{
   margin:0;
-  font-size:1.2rem;
+  color:#12121a;
+  font-size:1.55rem;
+  font-weight:700;
+  line-height:1.25;
 }
 
 .quotation-modal-header button{
   border:none;
-  background:none;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:#f1f5f9;
+  color:#12121a;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   cursor:pointer;
+  transition:.25s ease;
+}
+
+.quotation-modal-header button:hover{
+  background:#ef4444;
+  color:#fff;
+  transform:rotate(90deg);
 }
 
 .quotation-section{
-  padding:18px 20px;
-  border-bottom:1px solid #eef2f7;
+  padding:22px 28px;
+  border-bottom:1px solid #eceef2;
 }
 
 .quotation-section:last-child{
@@ -193,23 +234,34 @@ transform:none;
 
 .quotation-section h3{
   margin:0 0 14px;
-  font-size:1rem;
+  color:#12121a;
+  font-size:1.05rem;
+  font-weight:700;
 }
 
 .quotation-section p{
   margin:8px 0;
   line-height:1.55;
+  color:#475569;
+  word-break:break-word;
+}
+
+.quotation-section strong{
+  color:#12121a;
 }
 
 .description{
-  color:#4b5563;
+  color:#475569;
+  line-height:1.75;
+  white-space:pre-wrap;
 }
 
 .quotation-message{
   margin-top:16px;
   background:#f8fafc;
-  border-radius:8px;
-  padding:14px;
+  border:1px solid #e7edf3;
+  border-radius:14px;
+  padding:16px;
 }
 
 .quotation-message p{
@@ -221,11 +273,14 @@ transform:none;
 ========================================== */
 
 .badge{
-  display:inline-block;
-  padding:5px 10px;
+  display:inline-flex;
+  align-items:center;
+  width:fit-content;
+  padding:6px 14px;
   border-radius:30px;
   font-size:.8rem;
-  font-weight:600;
+  font-weight:700;
+  text-transform:capitalize;
 }
 
 .badge.accepted{
@@ -236,6 +291,35 @@ transform:none;
 .badge.rejected{
   background:#fee2e2;
   color:#dc2626;
+}
+
+.quotation-page .jobs-scroll,
+.quotation-table .table-wrapper{
+  scrollbar-width:thin;
+  scrollbar-color:#12121a #f1f5f9;
+}
+
+.quotation-page .jobs-scroll::-webkit-scrollbar,
+.quotation-table .table-wrapper::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+
+.quotation-page .jobs-scroll::-webkit-scrollbar-track,
+.quotation-table .table-wrapper::-webkit-scrollbar-track{
+  background:#f1f5f9;
+  border-radius:20px;
+}
+
+.quotation-page .jobs-scroll::-webkit-scrollbar-thumb,
+.quotation-table .table-wrapper::-webkit-scrollbar-thumb{
+  background:#12121a;
+  border-radius:20px;
+}
+
+.quotation-page .jobs-scroll::-webkit-scrollbar-thumb:hover,
+.quotation-table .table-wrapper::-webkit-scrollbar-thumb:hover{
+  background:#00b2ff;
 }
 
 /* ==========================================
@@ -267,7 +351,8 @@ flex-direction:column;
 }
 
 .quotation-modal{
-width:100%;
+width:100vw;
+height:100vh;
 max-height:100vh;
 border-radius:0;
 }

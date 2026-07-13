@@ -367,3 +367,68 @@
 }
 
 }
+
+/*==========================
+  MODAL PRESENTATION REFINEMENTS
+==========================*/
+
+.payment-modal-overlay{
+  background:rgba(18,18,26,.62);
+  backdrop-filter:blur(6px);
+  z-index:5000;
+}
+
+.payment-modal{
+  width:min(700px,94vw);
+  max-height:92vh;
+  overflow:auto;
+  color:#12121a;
+  border-radius:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.24);
+}
+
+.payment-modal h2{
+  margin:0 48px 28px 0;
+  color:#12121a;
+  font-size:1.7rem;
+  line-height:1.25;
+}
+
+.close-modal{
+  background:#f1f5f9;
+  color:#12121a;
+  transition:.25s ease;
+}
+
+.close-modal:hover{
+  background:#ef4444;
+  color:#fff;
+  transform:rotate(90deg);
+}
+
+.payment-details div{
+  background:#f8fafc;
+  border:1px solid #e7edf3;
+}
+
+.payment-details strong{
+  color:#64748b;
+}
+
+.payment-details span{
+  color:#12121a;
+}
+
+@media(max-width:768px){
+  .payment-modal-overlay{
+    padding:0;
+  }
+
+  .payment-modal{
+    width:100vw;
+    height:100vh;
+    max-height:100vh;
+    border-radius:0;
+    padding:24px;
+  }
+}

@@ -3,12 +3,12 @@
 ========================================================== */
 
 .profile-page {
-    padding: 25px;
+    padding: 10px; /* Minimal page margin */
 }
 
 .profile-card {
     background: var(--mjengo-white);
-    border-radius: 18px;
+    border-radius: 6px; /* Tighter corners */
     box-shadow: var(--mjengo-shadow);
     overflow: hidden;
 }
@@ -18,12 +18,12 @@
 ========================================================== */
 
 .profile-header {
-    padding: 22px 30px;
+    padding: 10px 14px; /* Ultra-thin header padding */
     border-bottom: 1px solid var(--mjengo-border);
 }
 
 .profile-header h2 {
-    font-size: 1.45rem;
+    font-size: 1.1rem; /* Smaller heading */
     font-weight: 700;
     color: var(--mjengo-dark);
 }
@@ -33,7 +33,7 @@
 ========================================================== */
 
 .profile-body {
-    padding: 30px;
+    padding: 14px; /* Reduced main body padding */
 }
 
 /* ==========================================================
@@ -43,33 +43,34 @@
 .profile-image-section {
     display: flex;
     align-items: center;
-    gap: 18px;
-    margin-bottom: 40px;
+    gap: 10px;
+    margin-bottom: 12px; /* Less space below avatar */
     flex-wrap: wrap;
 }
 
 .profile-avatar {
-    width: 90px;
-    height: 90px;
+    width: 48px; /* Tiny avatar size */
+    height: 48px;
     border-radius: 50%;
     object-fit: cover;
     background: #ececec;
-    border: 3px solid rgba(0,178,255,.15);
+    border: 2px solid rgba(0,178,255,.15);
 }
 
 .profile-image-actions{
     display:flex;
-    gap:14px;
+    gap:8px;
 }
 
 .upload-btn{
     border:none;
     background:var(--mjengo-blue);
     color:white;
-    padding:11px 28px;
-    border-radius:30px;
+    padding:5px 5px; /* Very compact buttons */
+    border-radius:4px;
     cursor:pointer;
     font-weight:600;
+    font-size: 12px;
     transition:.25s;
 }
 
@@ -78,29 +79,28 @@
     opacity:.95;
 }
 
-.remove-btn{
-    background:white;
-    border:1.5px solid #ffb8b8;
-    color:#ff7f7f;
-    padding:11px 28px;
-    border-radius:30px;
-    cursor:pointer;
-    font-weight:600;
-    transition:.25s;
+.remove-btn {
+    background: white;
+    border: 1px solid #ffb8b8; /* Thinner border */
+    color: #ff7f7f;
+    padding: 1px 3px; /* Minimal padding for a micro button */
+    border-radius: 4px; /* Tighter corner matching the rest */
+    cursor: pointer;
+    transition: .25s;
 }
-
 .remove-btn:hover{
     background:#fff4f4;
 }
 
+
 /* ==========================================================
-   FORM GRID
+   FORM GRID (Now 3 Columns for maximum efficiency)
 ========================================================== */
 
 .profile-form{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:24px;
+    grid-template-columns:repeat(3, 1fr); /* 3 columns takes up significantly less vertical space */
+    gap:10px; /* Minimal gap between inputs */
 }
 
 .form-group{
@@ -113,10 +113,10 @@
 }
 
 .form-group label{
-    font-size:.95rem;
+    font-size:.8rem; /* Tiny label text */
     font-weight:600;
     color:var(--mjengo-dark);
-    margin-bottom:10px;
+    margin-bottom:1px;
 }
 
 .form-group label span{
@@ -128,18 +128,21 @@
 .form-group select{
     width:100%;
     background:#f7f8fc;
-    border:none;
-    border-radius:12px;
-    padding:15px 18px;
-    font-size:15px;
+    border:1px solid #e2e8f0; /* Visible border helps micro layouts */
+    border-radius:4px;
+    padding:4px 8px; /* Micro padding inside inputs */
+    font-size:12px; /* Small legible text */
     color:var(--mjengo-dark);
     outline:none;
     transition:.25s;
 }
 
-.form-group textarea{
-    min-height:120px;
-    resize:vertical;
+.form-group textarea {
+    min-height: 40px; /* Cut down significantly to roughly 2 rows of text */
+    height: 40px;     /* Forces initial state to be very tiny */
+    padding: 4px 8px;
+    font-size: 12px;
+    resize: vertical; /* Allows the user to drag it bigger only if they need to */
 }
 
 .form-group input:focus,
@@ -156,114 +159,69 @@
 .profile-footer{
     display:flex;
     justify-content:flex-end;
-    margin-top:35px;
+    margin-top:14px;
 }
 
 .save-btn{
-    background:linear-gradient(
-        135deg,
-        var(--mjengo-purple),
+    background:
         var(--mjengo-blue)
-    );
+    ;
     color:white;
     border:none;
-    padding:14px 36px;
-    border-radius:12px;
-    font-size:15px;
+    padding:8px 10px;
+    border-radius:4px;
+    font-size:13px;
     font-weight:600;
     cursor:pointer;
     transition:.25s;
 }
 
 .save-btn:hover{
-    transform:translateY(-2px);
-    box-shadow:0 12px 24px rgba(0,178,255,.25);
+    transform:translateY(-1px);
+    box-shadow:0 4px 8px rgba(0,178,255,.25);
 }
 
 /* ==========================================================
    ALERTS
 ========================================================== */
 
+.profile-success, .profile-error{
+    border-radius:4px;
+    padding:8px 12px;
+    margin-bottom:12px;
+    font-size:12px;
+}
+
 .profile-success{
     background:#ecfdf5;
     color:#15803d;
     border:1px solid #bbf7d0;
-    border-radius:10px;
-    padding:14px 18px;
-    margin-bottom:20px;
 }
 
 .profile-error{
     background:#fef2f2;
     color:#b91c1c;
     border:1px solid #fecaca;
-    border-radius:10px;
-    padding:14px 18px;
-    margin-bottom:20px;
 }
 
 /* ==========================================================
    RESPONSIVE
 ========================================================== */
 
-@media (max-width:900px){
-
+@media (max-width:1024px){
     .profile-form{
-        grid-template-columns:1fr;
+        grid-template-columns: repeat(2, 1fr); /* Drops to 2 columns on tablets */
     }
-
 }
 
-@media (max-width:768px){
-
-    .profile-page{
-        padding:18px;
+@media (max-width:600px){
+    .profile-form{
+        grid-template-columns: 1fr; /* 1 column on small phones */
     }
-
-    .profile-body{
-        padding:22px;
+    
+    .profile-page, .profile-body{
+        padding:10px;
     }
-
-    .profile-header{
-        padding:18px 22px;
-    }
-
-    .profile-image-section{
-        flex-direction:column;
-        align-items:flex-start;
-    }
-
-    .profile-image-actions{
-        width:100%;
-    }
-
-    .upload-btn,
-    .remove-btn{
-        flex:1;
-        text-align:center;
-    }
-
-    .profile-footer{
-        justify-content:stretch;
-    }
-
-    .save-btn{
-        width:100%;
-    }
-
-}
-
-@media (max-width:480px){
-
-    .profile-avatar{
-        width:75px;
-        height:75px;
-    }
-
-    .profile-image-actions{
-        flex-direction:column;
-    }
-
 }
 
 /* ==========================================
@@ -271,34 +229,36 @@
 ========================================== */
 
 .profile-section-title{
-    margin:34px 0 18px;
-    font-size:1.15rem;
+    margin:14px 0 8px;
+    font-size:0.95rem;
     font-weight:700;
     color:#12121a;
-    padding-bottom:10px;
+    padding-bottom:4px;
     border-bottom:1px solid #e5e7eb;
+    grid-column: 1 / -1; /* Ensures title spans across all 3 columns */
 }
 
 .profile-readonly-card{
     display:flex;
     align-items:center;
-    gap:12px;
-    padding:14px 18px;
-    border-radius:14px;
+    gap:8px;
+    padding:6px 10px;
+    border-radius:4px;
     background:#f8fafc;
     border:1px solid #e2e8f0;
     font-weight:600;
     color:#334155;
+    font-size: 12px;
 }
 
 .profile-form textarea{
     width:100%;
-    min-height:140px;
+    min-height:30px; /* Compressed worker textarea */
     resize:vertical;
-    padding:14px;
-    border:1px solid #dbe4ef;
-    border-radius:12px;
-    font-size:.95rem;
+    padding:6px 5px;
+    border:1px solid #ffffff;
+    border-radius:4px;
+    font-size:12px;
     font-family:inherit;
     background:#fff;
     transition:.2s;
