@@ -73,24 +73,21 @@ export default function WorkerReviews() {
           const project = projects.find((p) => p.id === review.project);
 
           const job = jobs.find((j) => j.id === project?.job);
+const customer = customers.find(
+  (c) => Number(c.user) === Number(review.customer)
+);
 
-          const customerProfile = customers.find(
-            (c) => c.id === review.customer,
-          );
+return {
+  ...review,
+  project,
+  job,
+  customer,
+  fullName: customer
+    ? `${customer.first_name} ${customer.last_name}`
+    : "Unknown Customer",
 
-          const customer = userList.find((u) => u.id === customerProfile?.user);
-
-          return {
-            ...review,
-            project,
-            job,
-            customer,
-            fullName: customer
-              ? `${customer.first_name} ${customer.last_name}`
-              : "Unknown Customer",
-
-            date: new Date(review.created_at).toLocaleDateString(),
-          };
+  date: new Date(review.created_at).toLocaleDateString(),
+};
         })
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
@@ -316,11 +313,20 @@ export default function WorkerReviews() {
           className="review-modal-overlay"
           onClick={() => setSelectedReview(null)}
         >
-          <div className="review-modal" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="review-modal"
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="review-modal-header">
               <h2>Review Details</h2>
 
-              <button onClick={() => setSelectedReview(null)}>
+              <button
+                type="button"
+                onClick={() => setSelectedReview(null)}
+                aria-label="Close review details"
+              >
                 <X size={20} />
               </button>
             </div>

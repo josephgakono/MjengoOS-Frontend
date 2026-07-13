@@ -280,13 +280,22 @@ export default function WorkerQuotations() {
 
       {selected && (
         <div className="quotation-overlay" onClick={() => setSelected(null)}>
-          <div className="quotation-modal" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="quotation-modal"
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header */}
 
             <div className="quotation-modal-header">
               <h2>Quotation Details</h2>
 
-              <button onClick={() => setSelected(null)}>
+              <button
+                type="button"
+                onClick={() => setSelected(null)}
+                aria-label="Close quotation details"
+              >
                 <X size={20} />
               </button>
             </div>
