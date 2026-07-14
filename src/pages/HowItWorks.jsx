@@ -12,7 +12,9 @@ import {
 
 export default function HowItWorks() {
   return (
-    <main className="how-page">
+    <main className="how-page page-with-navbar-offset">
+      <div className="page-container">
+
       {/* Hero */}
       <section className="how-hero">
         
@@ -156,6 +158,7 @@ export default function HowItWorks() {
           beginning to completion.
         </p>
       </section>
+      </div>
     </main>
   );
 }

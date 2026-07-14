@@ -215,7 +215,9 @@ function Auth() {
   };
 
   return (
-    <main className="auth-page">
+    <main className="auth-page page-with-navbar-offset">
+      <div className="page-container">
+
       <section className="auth-shell" aria-labelledby="auth-title">
         <div className="auth-panel auth-panel--copy">
           <span className="auth-panel__eyebrow">{pageCopy.eyebrow}</span>
@@ -309,7 +311,6 @@ function Auth() {
                 >
                   <option value="customer">Customer</option>
                   <option value="worker">Worker</option>
-                  <option value="contractor">Contractor</option>
                 </select>
               </label>
 
@@ -372,6 +373,7 @@ function Auth() {
           </button>
         </form>
       </section>
+      </div>
     </main>
   );
 }

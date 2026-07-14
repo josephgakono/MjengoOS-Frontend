@@ -75,9 +75,16 @@ export default function WorkerDashboard() {
 
       <main className="dashboard-main">
         {/* ================= Dashboard ================= */}
-        {activeTab === "dashboard" && (<>
-         <DashboardHeader/>
-          <DashboardPage setActiveTab={setActiveTab} /></>
+        {activeTab === "dashboard" && (
+          <>
+            <DashboardHeader
+              title="Worker Dashboard"
+              subtitle="Access jobs , quotations and projects you have worked on."
+              setSidebarOpen={setSidebarOpen}
+            />
+
+            <DashboardPage />
+          </>
         )}
         {/*================= Available Jobs ================= */}
         {activeTab === "jobs" && (

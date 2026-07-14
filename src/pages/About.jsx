@@ -10,7 +10,9 @@ import {
 
 export default function About() {
   return (
-    <main className="about-page">
+    <main className="about-page page-with-navbar-offset">
+      <div className="page-container">
+
 
       {/* Hero */}
 
@@ -152,6 +154,7 @@ export default function About() {
 
       </section>
 
+      </div>
     </main>
   );
 }

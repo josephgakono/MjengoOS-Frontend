@@ -73,7 +73,9 @@ export default function Jobs() {
   }, [jobs, search]);
 
   return (
-    <div className="jobs-page">
+    <div className="jobs-page page-with-navbar-offset">
+      <div className="page-container">
+
       {/* HERO */}
 
       <section className="jobs-hero">
@@ -203,6 +205,7 @@ export default function Jobs() {
         workerId={user?.worker_profile_id}
         onSuccess={fetchJobs}
       />
+        </div>
     </div>
   );
 }

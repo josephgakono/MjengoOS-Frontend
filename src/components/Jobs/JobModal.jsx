@@ -43,7 +43,6 @@ export default function JobModal({ open, jobId, onClose }) {
 
         setJob(jobData);
 
-
         const quotations = Array.isArray(quotationData)
           ? quotationData
           : quotationData.results || [];
@@ -51,7 +50,7 @@ export default function JobModal({ open, jobId, onClose }) {
         const accepted = quotations.find(
           (q) =>
             q.job === jobData.id &&
-            (q.status === "accepted" || q.accepted === true)
+            (q.status === "accepted" || q.accepted === true),
         );
 
         setBudget(accepted ? accepted.amount : null);
@@ -61,13 +60,10 @@ export default function JobModal({ open, jobId, onClose }) {
           : progressData.results || [];
 
         const filtered = progress
-          .filter((u) => u.job === jobData.id)
-          .sort(
-            (a, b) =>
-              new Date(b.created_at) -
-              new Date(a.created_at)
-          );
+          .filter((u) => jobData.project_id && u.project === jobData.project_id)
+          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
+        setUpdates(filtered);
         setUpdates(filtered);
       } catch (err) {
         console.error(err);
@@ -113,25 +109,17 @@ export default function JobModal({ open, jobId, onClose }) {
       <div className="job-modal-overlay" onClick={onClose}></div>
 
       <div className="job-modal">
-
-        <button
-          className="job-modal-close"
-          onClick={onClose}
-        >
+        <button className="job-modal-close" onClick={onClose}>
           <X size={20} />
         </button>
 
         {loading ? (
-          <div className="job-modal-loading">
-            Loading job...
-          </div>
+          <div className="job-modal-loading">Loading job...</div>
         ) : error ? (
-          <div className="job-modal-error">
-            {error}
-          </div>
+          <div className="job-modal-error">{error}</div>
         ) : (
           <>
-                      {/* ================= HEADER ================= */}
+            {/* ================= HEADER ================= */}
 
             <div className="job-header">
               <h2>{job.title}</h2>
@@ -141,11 +129,12 @@ export default function JobModal({ open, jobId, onClose }) {
             {/* ================= DETAILS ================= */}
 
             <div className="job-details">
-
               <InfoRow
                 icon={<User size={18} />}
                 label="Worker"
-                value={job.worker_name || job.worker?.username || "Not Assigned"}
+                value={
+                  job.worker_name || job.worker?.username || "Not Assigned"
+                }
               />
 
               <InfoRow
@@ -179,65 +168,45 @@ export default function JobModal({ open, jobId, onClose }) {
                     : "No accepted quotation"
                 }
               />
-
             </div>
 
             {/* ================= DESCRIPTION ================= */}
 
             <div className="job-section">
-
               <div className="section-title">
-                <FileText size={18}/>
+                <FileText size={18} />
                 <span>Description</span>
               </div>
 
               <p className="job-description">
                 {job.description || "No description provided."}
               </p>
-
             </div>
 
             {/* ================= PROGRESS ================= */}
 
             <div className="job-section">
-
               <div className="section-header">
-
                 <h3>Progress Updates</h3>
 
                 <span>{updates.length}</span>
-
               </div>
 
               <div className="progress-list">
-
                 {updates.length === 0 && (
-
                   <div className="progress-empty">
-
-                    <ImageIcon size={34}/>
+                    <ImageIcon size={34} />
 
                     <p>No progress updates yet.</p>
-
                   </div>
-
                 )}
 
                 {updates.map((update) => (
-
-                  <div
-                    key={update.id}
-                    className="progress-item"
-                  >
-
+                  <div key={update.id} className="progress-item">
                     <div className="progress-top">
-
                       <div>
-
                         <h4>
-                          {job.worker_name ||
-                           job.worker?.username ||
-                           "Worker"}
+                          {job.worker_name || job.worker?.username || "Worker"}
                         </h4>
 
                         <span>
@@ -245,63 +214,34 @@ export default function JobModal({ open, jobId, onClose }) {
                           {" • "}
                           {formatTime(update.created_at)}
                         </span>
-
                       </div>
-
                     </div>
 
-                    <p className="progress-description">
-                      {update.description}
-                    </p>
+                    <p className="progress-description">{update.description}</p>
 
-                    {(update.image ||
-                      (update.images &&
-                       update.images.length > 0)) ? (
-
+                    {update.image ||
+                    (update.images && update.images.length > 0) ? (
                       <div className="progress-gallery">
+                        {update.image && <img src={update.image} alt="" />}
 
-                        {update.image && (
-                          <img
-                            src={update.image}
-                            alt=""
-                          />
-                        )}
-
-                        {update.images?.map((img,index)=>(
-                          <img
-                            key={index}
-                            src={img.image}
-                            alt=""
-                          />
+                        {update.images?.map((img, index) => (
+                          <img key={index} src={img.image} alt="" />
                         ))}
-
                       </div>
-
                     ) : (
-
                       <div className="progress-no-image">
-
-                        <ImageIcon size={18}/>
+                        <ImageIcon size={18} />
 
                         <span>No images uploaded</span>
-
                       </div>
-
                     )}
-
                   </div>
-
                 ))}
-
               </div>
-
             </div>
-
           </>
         )}
-
       </div>
-
     </>
   );
 }
@@ -309,19 +249,11 @@ export default function JobModal({ open, jobId, onClose }) {
 function InfoRow({ icon, label, value }) {
   return (
     <div className="job-row">
+      <div className="job-row-icon">{icon}</div>
 
-      <div className="job-row-icon">
-        {icon}
-      </div>
+      <div className="job-row-label">{label}</div>
 
-      <div className="job-row-label">
-        {label}
-      </div>
-
-      <div className="job-row-value">
-        {value}
-      </div>
-
+      <div className="job-row-value">{value}</div>
     </div>
   );
 }

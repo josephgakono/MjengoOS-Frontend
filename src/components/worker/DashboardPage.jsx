@@ -195,36 +195,7 @@ export default function DashboardPage({ setActiveTab }) {
 
   return (
     <div className="worker-dashboard">
-      {/* Header */}
-
-      <div className="dashboard-header">
-        <div>
-          <h1>Welcome back, {user?.first_name || user?.username}</h1>
-
-          <p>Here's a quick overview of your work today.</p>
-        </div>
-
-        <div className="dashboard-profile">
-          {user?.profile_picture ? (
-            <img src={user.profile_picture} alt="" />
-          ) : (
-            <div className="dashboard-avatar">
-              {(
-                user?.first_name?.[0] ||
-                user?.username?.[0] ||
-                "U"
-              ).toUpperCase()}
-            </div>
-          )}
-
-          <div>
-            <strong>{profile?.profession || "Worker"}</strong>
-
-            <span>{profile?.location || "No location set"}</span>
-          </div>
-        </div>
-      </div>
-
+      
       {/* Statistics */}
 
       <div className="dashboard-stats">
@@ -329,14 +300,6 @@ export default function DashboardPage({ setActiveTab }) {
               <span className={`project-status ${currentProject.status}`}>
                 {currentProject.status}
               </span>
-
-              <button
-                className="dashboard-btn"
-                onClick={() => (window.location.href = "/worker/projects")}
-              >
-                View Project
-                <ArrowRight size={16} />
-              </button>
             </div>
           ) : (
             <div className="dashboard-empty">No active project.</div>

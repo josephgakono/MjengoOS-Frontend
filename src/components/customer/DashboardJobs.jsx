@@ -11,6 +11,7 @@ import {
 import JobModal from "../Jobs/JobModal.jsx";
 import { api } from "../../services/api";
 import "../../styles/Jobs.css";
+import PostJobModal from "../Jobs/PostJobModal.jsx";
 
 export default function DashboardJobs({ onPostJob }) {
   //-------------------------------------------------------
@@ -21,6 +22,7 @@ export default function DashboardJobs({ onPostJob }) {
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
   const [showJobModal, setShowJobModal] = useState(false);
+  const [showPostJobModal, setShowPostJobModal] = useState(false);
 
   //-------------------------------------------------------
   // Load Jobs
@@ -105,7 +107,6 @@ export default function DashboardJobs({ onPostJob }) {
   function JobCard({ job, completed }) {
     return (
       <button className="job-item" onClick={() => openJob(job)}>
-        
         <div className="job-item-top">
           <div>
             <h4>{job.title}</h4>
@@ -201,7 +202,10 @@ export default function DashboardJobs({ onPostJob }) {
             <p>Manage every construction job you've posted.</p>
           </div>
 
-          <button className="post-job-btn" onClick={onPostJob}>
+          <button
+            className="post-job-btn"
+            onClick={() => setShowPostJobModal(true)}
+          >
             <Plus size={18} />
             Post New Job
           </button>
@@ -264,12 +268,15 @@ export default function DashboardJobs({ onPostJob }) {
       Future Modal Hook
       ====================================*/}
       <JobModal
-    open={showJobModal}
-    jobId={selectedJob?.id}
-    onClose={closeJob}
-/>
-
-      
+        open={showJobModal}
+        jobId={selectedJob?.id}
+        onClose={closeJob}
+      />
+      <PostJobModal
+        isOpen={showPostJobModal}
+        onClose={() => setShowPostJobModal(false)}
+        onJobCreated={loadJobs}
+      />
     </>
   );
 }
