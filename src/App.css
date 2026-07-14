@@ -97,7 +97,7 @@ body {
   display: grid;
   grid-template-columns: minmax(210px, 1fr) auto minmax(210px, 1fr);
   align-items: center;
-  width: min(100% - 52px, 1248px);
+  width: 98%;
   min-height: 68px;
   margin: 0 auto;
   gap: 24px;
