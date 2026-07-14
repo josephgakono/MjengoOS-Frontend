@@ -75,8 +75,9 @@ export default function WorkerDashboard() {
 
       <main className="dashboard-main">
         {/* ================= Dashboard ================= */}
-        {activeTab === "dashboard" && (
-          <DashboardPage setActiveTab={setActiveTab} />
+        {activeTab === "dashboard" && (<>
+         <DashboardHeader/>
+          <DashboardPage setActiveTab={setActiveTab} /></>
         )}
         {/*================= Available Jobs ================= */}
         {activeTab === "jobs" && (

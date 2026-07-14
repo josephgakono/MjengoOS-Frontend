@@ -9,6 +9,7 @@ import {
   Star,
   User,
 } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 
 export default function Sidebar({
   activeTab,
@@ -16,6 +17,7 @@ export default function Sidebar({
   sidebarOpen,
   setSidebarOpen,
 }) {
+  const navigate = useNavigate();
   const menuItems = [
     {
       name: "Dashboard",
@@ -92,7 +94,9 @@ export default function Sidebar({
           <h4>Need Help?</h4>
           <p>Our support team is here to help.</p>
 
-          <button>Contact Support</button>
+           <button onClick={() => navigate('/contact')}>
+      Contact Support
+    </button>
         </div>
       </aside>
     </>

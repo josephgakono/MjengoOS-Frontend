@@ -1,0 +1,268 @@
+/* ==========================================
+   QUOTE MODAL
+========================================== */
+
+.quote-modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 16px;
+
+  overflow-y: auto;
+
+  z-index: 3000;
+}
+
+.quote-modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  animation: quoteModalIn 0.22s ease;
+}
+@keyframes quoteModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.quote-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 14px 16px;
+    border-bottom: 1px solid #ececec;
+}
+
+.quote-modal-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #111827;
+}
+
+.quote-modal-header p {
+    margin: 4px 0 0;
+    font-size: .9rem;
+    color: #6b7280;
+}
+
+.quote-close-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .2s;
+}
+
+.quote-close-btn:hover {
+    color: #111827;
+}
+
+/* ==========================================
+   JOB SUMMARY
+========================================== */
+
+.quote-job-summary {
+    padding: 14px 16px;
+    background: #fafafa;
+    border-bottom: 1px solid #ececec;
+}
+
+.quote-job-summary h3 {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    color: #111827;
+}
+
+.quote-summary-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: .9rem;
+    color: #4b5563;
+}
+
+.quote-summary-item strong {
+    color: #111827;
+}
+
+/* ==========================================
+   BUDGET INDICATOR
+========================================== */
+
+.budget-indicator {
+    margin: 12px 16px 0;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: .88rem;
+    line-height: 1.45;
+}
+
+.budget-indicator.good {
+    background: #ecfdf5;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.budget-indicator.high {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+}
+
+/* ==========================================
+   FORM
+========================================== */
+
+.quote-form {
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.quote-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: .9rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.quote-form input,
+.quote-form textarea {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: .92rem;
+    outline: none;
+    transition: .2s;
+    resize: vertical;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.quote-form input:focus,
+.quote-form textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+}
+
+.quote-form textarea {
+    min-height: 110px;
+}
+
+.textarea-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ==========================================
+   ERRORS
+========================================== */
+
+.field-error {
+    color: #dc2626;
+    font-size: .78rem;
+    margin-top: 2px;
+}
+
+/* ==========================================
+   FOOTER
+========================================== */
+
+.quote-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.quote-cancel-btn,
+.quote-submit-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: .9rem;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.quote-cancel-btn {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.quote-cancel-btn:hover {
+    background: #e5e7eb;
+}
+
+.quote-submit-btn {
+    background: #2563eb;
+    color: #fff;
+}
+
+.quote-submit-btn:hover:not(:disabled) {
+    background: #1d4ed8;
+}
+
+.quote-submit-btn:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 640px) {
+    .quote-modal {
+        max-width: 100%;
+        border-radius: 10px;
+    }
+
+    .quote-modal-header,
+    .quote-job-summary,
+    .quote-form {
+        padding: 12px;
+    }
+
+    .quote-modal-footer {
+        flex-direction: column;
+    }
+
+    .quote-cancel-btn,
+    .quote-submit-btn {
+        width: 100%;
+    }
+}

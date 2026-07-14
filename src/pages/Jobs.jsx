@@ -6,20 +6,29 @@ import {
   Calendar,
   User,
   Briefcase,
+  X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
 import { api } from "../services/api";
+import QuoteModal from "../components/worker/QuoteModal";
 
 export default function Jobs() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
+
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+
+  const user = storedUser || {};
+
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const button = getButtonState();
-  const [showPopup, setShowPopup] = useState(false);
+
   const [search, setSearch] = useState("");
-  
+
+  const [showPopup, setShowPopup] = useState(false);
+
+  const [showQuoteModal, setShowQuoteModal] = useState(false);
+
+  const [selectedJob, setSelectedJob] = useState(null);
 
   useEffect(() => {
     fetchJobs();
@@ -39,38 +48,25 @@ export default function Jobs() {
     }
   }
 
-  function getButtonState() {
-  if (!user) {
-    return {
-      text: "Login to Quote",
-      action: () => navigate("/login"),
-    };
-  }
+  function openQuote(job) {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
 
-  if (user.user_type === "worker" || user.user_type === "contractor") {
-    return {
-      text: "Quote for this Job",
-      action: () => {
-        // We'll implement quotation later.
-        console.log("Open quotation modal");
-      },
-    };
-  }
+    if (user.user_type !== "worker" && user.user_type !== "contractor") {
+      setShowPopup(true);
+      return;
+    }
 
-  return {
-    text: "Only Workers Can Quote",
-    action: () => setShowPopup(true),
-  };
-}
+    setSelectedJob(job);
+
+    setShowQuoteModal(true);
+  }
 
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
-      const text = (
-        job.title +
-        job.description +
-        job.location +
-        job.customer_username
-      ).toLowerCase();
+      const text = (job.title + job.description + job.location).toLowerCase();
 
       return text.includes(search.toLowerCase());
     });
@@ -90,20 +86,19 @@ export default function Jobs() {
 
           <input
             type="text"
-            placeholder="Search jobs, locations..."
+            placeholder="Search jobs or locations..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
       </section>
 
-      {/* RESULTS */}
+      {/* JOBS */}
 
       <section className="jobs-results">
         <div className="jobs-results-header">
           <h2>{filteredJobs.length} Open Jobs</h2>
         </div>
-
         {loading ? (
           <div className="jobs-loading">Loading jobs...</div>
         ) : filteredJobs.length === 0 ? (
@@ -124,7 +119,7 @@ export default function Jobs() {
 
                 <div className="job-body">
                   <div className="job-top">
-                    <span className="job-open">OPEN</span>
+                    <span className="job-open">{job.status.toUpperCase()}</span>
 
                     <span className="job-budget">
                       KES {Number(job.budget).toLocaleString()}
@@ -142,7 +137,6 @@ export default function Jobs() {
                   <div className="job-meta">
                     <span>
                       <MapPin size={16} />
-
                       {job.location}
                     </span>
 
@@ -155,19 +149,22 @@ export default function Jobs() {
                   <div className="job-footer">
                     <div>
                       <User size={16} />
-
-                      {job.customer_username}
+                      Customer #{job.customer}
                     </div>
 
                     <div>
                       <Calendar size={16} />
-
                       {new Date(job.created_at).toLocaleDateString()}
                     </div>
                   </div>
 
-                  <button className="apply-btn" onClick={button.action}>
-                    {button.text}
+                  <button className="apply-btn" onClick={() => openQuote(job)}>
+                    {!user
+                      ? "Login to Quote"
+                      : user.user_type === "worker" ||
+                          user.user_type === "contractor"
+                        ? "Quote for this Job"
+                        : "Only Workers Can Quote"}
                   </button>
                 </div>
               </article>
@@ -175,20 +172,37 @@ export default function Jobs() {
           </div>
         )}
       </section>
+
+      {/* Worker Required Popup */}
+
       {showPopup && (
         <div
           className="quote-popup-overlay"
           onClick={() => setShowPopup(false)}
         >
           <div className="quote-popup" onClick={(e) => e.stopPropagation()}>
-            <h3>Worker Profile Required</h3>
+            <button className="popup-close" onClick={() => setShowPopup(false)}>
+              <X size={20} />
+            </button>
 
-            <p>Login with a worker profile to quote for this job.</p>
+            <h2>Worker Account Required</h2>
 
-            <button onClick={() => setShowPopup(false)}>Close</button>
+            <p>Only workers and contractors can submit quotations for jobs.</p>
+
+            <button className="apply-btn" onClick={() => setShowPopup(false)}>
+              Close
+            </button>
           </div>
         </div>
       )}
+
+      <QuoteModal
+        open={showQuoteModal}
+        onClose={() => setShowQuoteModal(false)}
+        job={selectedJob}
+        workerId={user?.worker_profile_id}
+        onSuccess={fetchJobs}
+      />
     </div>
   );
 }
