@@ -42,7 +42,7 @@ export default function ProjectModal({ open, project, onClose }) {
         setLoading(true);
 
         const [jobData, updatesData] = await Promise.all([
-          api.get(`jobs/${project.job}/`),
+          api.get(`jobs/${project.job.id || project.job}/`),
           api.get("progress-updates/"),
         ]);
 
@@ -65,7 +65,7 @@ export default function ProjectModal({ open, project, onClose }) {
         console.error(err);
       } finally {
         if (!cancelled) setLoading(false);
-      }
+      } console.log("Project received by modal:", project);
     }
 
     loadData();
@@ -82,7 +82,7 @@ export default function ProjectModal({ open, project, onClose }) {
       setLoading(true);
 
       const [jobData, updatesData] = await Promise.all([
-        api.get(`jobs/${project.job}/`),
+        api.get(`jobs/${project.job.id || project.job}/`),
         api.get("progress-updates/"),
       ]);
 
@@ -140,7 +140,7 @@ export default function ProjectModal({ open, project, onClose }) {
         data.append("image", form.image);
       }
 
-      await api.upload("progress-updates/", data);
+      await api.upload("progress-updates/", data ,"POST");
 
       setForm({
         description: "",
@@ -149,7 +149,7 @@ export default function ProjectModal({ open, project, onClose }) {
 
       setMessage("Progress update posted.");
 
-      reloadData();
+      await reloadData();
 
     } catch (err) {
       console.error(err);
