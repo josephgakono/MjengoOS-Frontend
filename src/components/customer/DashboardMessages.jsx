@@ -268,14 +268,6 @@ export default function DashboardMessages() {
     <>
       <div className="messages-page">
         <div className="messages-header">
-          <div>
-            <h2>Messages</h2>
-
-            <p>
-              Chat with {isCustomer ? "workers" : "customers"} you've worked
-              with.
-            </p>
-          </div>
 
           <div className="messages-count">
             <Users size={18} />

@@ -106,6 +106,7 @@ export default function CustomerReviews() {
         rating: form.rating,
         comment: form.comment,
       });
+      alert("Review submitted successfully.");
 
       setReviewProject(null);
 

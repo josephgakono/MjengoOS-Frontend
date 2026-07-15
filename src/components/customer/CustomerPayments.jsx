@@ -241,10 +241,8 @@ export default function CustomerPayments() {
                 <th>Project</th>
                 <th>Worker</th>
                 <th>Amount</th>
-                <th>Receipt</th>
                 <th>Escrow</th>
                 <th>Status</th>
-                <th>Date</th>
                 <th></th>
               </tr>
             </thead>
@@ -271,7 +269,7 @@ export default function CustomerPayments() {
 
                       <td>{formatMoney(payment.amount)}</td>
 
-                      <td>{payment.mpesa_receipt_number || "-"}</td>
+                      
 
                       <td>
                         <span className={badge(payment.escrow_status)}>
@@ -284,8 +282,6 @@ export default function CustomerPayments() {
                           {payment.status}
                         </span>
                       </td>
-
-                      <td>{formatDate(payment.created_at)}</td>
 
                       <td>
                         <button
